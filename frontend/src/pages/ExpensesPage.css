@@ -1,0 +1,293 @@
+/* ═══════════════════════════════════════════
+   EXPENSES PAGE
+   ═══════════════════════════════════════════ */
+
+.expenses-page {
+  /* min-height handled by AppLayout */
+  background: var(--bg-base);
+}
+
+/* ── KPI Strip ── */
+
+.expense-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.expense-kpi-card {
+  background: #FFFFFF;
+  border: 2px solid var(--border-default);
+  border-radius: 0;
+  padding: 16px 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s var(--ease-default);
+}
+.expense-kpi-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+.expense-kpi-card:hover {
+  border-color: var(--border-default);
+  /* no lift */
+  /* no shadow */
+}
+.expense-kpi-card--fuel::before       { background: var(--accent-blue); }
+.expense-kpi-card--maintenance::before { background: var(--accent-amber); }
+.expense-kpi-card--toll::before       { background: var(--accent-orange); }
+.expense-kpi-card--other::before      { background: var(--accent-purple); }
+.expense-kpi-card--total::before      { background: var(--accent-green); }
+
+.expense-kpi-value {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: var(--space-1);
+  font-family: var(--font-mono);
+}
+.expense-kpi-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* ── Tab Navigation ── */
+
+.expense-tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 20px;
+  background: var(--bg-subtle);
+  border-radius: 0;
+  padding: 3px;
+  width: fit-content;
+  border: 2px solid var(--border-default);
+}
+.expense-tab {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 8px 20px;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 0;
+  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+}
+.expense-tab:hover {
+  color: var(--text-secondary);
+}
+.expense-tab.active {
+  background: #FFFFFF;
+  color: var(--accent-green);
+  /* no shadow */
+}
+
+/* ── Filter Row ── */
+
+.expense-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+/* ── Table Container ── */
+
+.expense-table-container {
+  background: #FFFFFF;
+  border: 2px solid var(--border-default);
+  border-radius: 0;
+  overflow: hidden;
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+/* ── Expense Type Badge ── */
+
+.expense-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.expense-type-badge--fuel {
+  background: var(--accent-blue-muted);
+  color: var(--accent-blue);
+}
+.expense-type-badge--maintenance {
+  background: var(--accent-amber-muted);
+  color: var(--accent-amber);
+}
+.expense-type-badge--toll {
+  background: var(--accent-orange-muted);
+  color: var(--accent-orange);
+}
+.expense-type-badge--permit {
+  background: var(--accent-cyan-muted);
+  color: var(--accent-cyan);
+}
+.expense-type-badge--other {
+  background: var(--accent-purple-muted);
+  color: var(--accent-purple);
+}
+
+/* ── Summary Tab — Cost per Vehicle ── */
+
+.expense-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.expense-summary-card {
+  background: #FFFFFF;
+  border: 2px solid var(--border-default);
+  border-radius: 0;
+  padding: 16px 20px;
+  transition: all 0.3s var(--ease-default);
+  animation: staggerFadeIn 0.3s var(--ease-default) backwards;
+}
+.expense-summary-card:hover {
+  border-color: var(--border-default);
+  /* no lift */
+  /* no shadow */
+}
+
+.expense-summary-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+.expense-summary-vehicle {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent-blue);
+}
+.expense-summary-total {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.expense-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.expense-breakdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+}
+.expense-breakdown-item:not(:last-child) {
+  border-bottom: 2px solid var(--border-default);
+}
+.expense-breakdown-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.expense-breakdown-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.expense-breakdown-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ── Stacked Bar in Summary Card ── */
+
+.expense-bar-stack {
+  display: flex;
+  height: 6px;
+  border-radius: 0;
+  overflow: hidden;
+  margin-top: var(--space-3);
+  background: var(--bg-subtle);
+}
+.expense-bar-segment {
+  height: 100%;
+  transition: width 0.5s var(--ease-default);
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 1200px) {
+  .expense-kpi-strip {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .expense-kpi-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .expense-tabs {
+    width: 100%;
+  }
+  .expense-tab {
+    flex: 1;
+    text-align: center;
+  }
+  .expense-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 480px) {
+  .expense-kpi-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .expense-filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .expense-filter-row .filter-select,
+  .expense-filter-row .input-field {
+    width: 100%;
+  }
+
+  .expense-tabs {
+    width: 100%;
+  }
+
+  .expense-tab {
+    flex: 1;
+    text-align: center;
+    padding: 8px 12px;
+  }
+}

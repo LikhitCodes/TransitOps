@@ -1,0 +1,67 @@
+/* ═══════════════════════════════════════════════════
+   AppLayout — Sidebar + Topbar + Content grid
+   ═══════════════════════════════════════════════════ */
+
+.app-layout {
+  min-height: 100vh;
+  background: var(--bg-base);
+}
+
+.app-content {
+  margin-left: var(--sidebar-width);
+  margin-top: var(--topbar-height);
+  padding: 16px;
+  min-height: calc(100vh - var(--topbar-height));
+  animation: fadeIn 0.3s var(--ease-default);
+}
+
+/* Responsive: collapse sidebar on small screens */
+@media (max-width: 1024px) {
+  .app-content {
+    margin-left: 0;
+    padding: var(--space-4);
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s var(--ease-default);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .topbar {
+    left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-content {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .app-content {
+    padding: 8px;
+  }
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 95;
+  animation: fadeIn 0.2s var(--ease-default);
+}
+
+@media (min-width: 1025px) {
+  .sidebar-overlay {
+    display: none;
+  }
+}
+

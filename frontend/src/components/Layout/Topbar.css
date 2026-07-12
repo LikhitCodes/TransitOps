@@ -1,0 +1,169 @@
+/* ═══════════════════════════════════════════════════
+   Topbar — Fixed top navigation bar
+   ═══════════════════════════════════════════════════ */
+
+.topbar {
+  height: var(--topbar-height);
+  background: #FFFFFF;
+  border-bottom: 2px solid var(--border-default);
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-width);
+  right: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6);
+}
+
+.topbar-search-area {
+  flex: 1;
+  max-width: 400px;
+}
+
+.topbar-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.topbar-search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.topbar-search-input {
+  width: 100%;
+  background: var(--bg-subtle);
+  border: 2px solid var(--border-default);
+  border-radius: 0;
+  padding: 8px 12px 8px 36px;
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.topbar-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.topbar-search-input:focus {
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 224, 90, 0.1);
+}
+
+.topbar-search-input:hover:not(:focus) {
+  border-color: var(--border-strong);
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.topbar-user-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.topbar-user-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  padding: 4px 4px 4px 12px;
+}
+
+.topbar-role-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.topbar-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-amber);
+  color: var(--text-on-accent);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.02em;
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE & HAMBURGER TOGGLE
+   ═══════════════════════════════════════════ */
+
+.topbar-hamburger {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .topbar {
+    padding: 0 var(--space-4);
+  }
+
+  .topbar-hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border: 3px solid #000000;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    color: #000000;
+    margin-right: var(--space-3);
+    transition: all 0.1s ease;
+    flex-shrink: 0;
+  }
+
+  .topbar-hamburger:hover {
+    background: var(--bg-subtle);
+  }
+
+  .topbar-hamburger:active {
+    background: var(--accent-green-muted);
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar-user-name {
+    display: none;
+  }
+  
+  .topbar-search-area {
+    max-width: 160px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .topbar-search-input {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 400px) {
+  .topbar-role-label {
+    display: none;
+  }
+  
+  .topbar-user-badge {
+    padding: 4px;
+  }
+}
+
