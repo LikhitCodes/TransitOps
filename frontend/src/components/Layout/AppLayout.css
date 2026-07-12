@@ -16,10 +16,15 @@
 }
 
 /* Responsive: collapse sidebar on small screens */
+.sidebar-overlay {
+  display: none;
+}
+
 @media (max-width: 1024px) {
   .app-content {
     margin-left: 0;
     padding: var(--space-4);
+    overflow-x: hidden;
   }
 
   .sidebar {
@@ -29,6 +34,19 @@
 
   .sidebar.open {
     transform: translateX(0);
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 90; /* just below sidebar which is 100 */
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.3s ease;
   }
 
   .topbar {

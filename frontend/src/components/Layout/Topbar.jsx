@@ -5,7 +5,7 @@ import './Topbar.css';
  * Top navigation bar — search input + user info with role badge.
  * Fixed at top, offset by sidebar width.
  */
-export default function Topbar() {
+export default function Topbar({ onToggleSidebar }) {
   const { user } = useAuth();
 
   const displayName = user?.email
@@ -24,6 +24,18 @@ export default function Topbar() {
 
   return (
     <header className="topbar">
+      <button 
+        className="topbar-hamburger" 
+        onClick={onToggleSidebar} 
+        aria-label="Toggle navigation menu"
+        id="topbar-hamburger"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
       <div className="topbar-search-area">
         <div className="topbar-search">
           <svg className="topbar-search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

@@ -114,3 +114,29 @@
   background: var(--accent-red-muted);
   color: var(--accent-red);
 }
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-close-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+}
+.sidebar-close-btn:hover {
+  color: var(--text-primary);
+}
+
+@media (max-width: 1024px) {
+  .sidebar-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

@@ -164,4 +164,16 @@
   .dashboard-kpi-row {
     grid-template-columns: repeat(2, 1fr);
   }
+  .dashboard-recent-trips,
+  .dashboard-vehicle-status {
+    padding: var(--space-4);
+  }
+  .status-bar-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .status-bar-label {
+    text-align: left;
+  }
 }
