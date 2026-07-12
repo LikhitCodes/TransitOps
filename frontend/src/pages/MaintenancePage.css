@@ -1,0 +1,279 @@
+/* ═══════════════════════════════════════════
+   MAINTENANCE PAGE
+   ═══════════════════════════════════════════ */
+
+.maintenance-page {
+  min-height: 100vh;
+  background: var(--bg-base);
+}
+
+/* ── KPI Strip ── */
+
+.maint-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.maint-kpi-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s var(--ease-default);
+}
+.maint-kpi-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+.maint-kpi-card:hover {
+  border-color: var(--border-default);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+.maint-kpi-card--active::before   { background: var(--accent-amber); }
+.maint-kpi-card--closed::before   { background: var(--accent-green); }
+.maint-kpi-card--cost::before     { background: var(--accent-orange); }
+.maint-kpi-card--vehicles::before { background: var(--accent-blue); }
+
+.maint-kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: var(--space-1);
+}
+.maint-kpi-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* ── Split Layout ── */
+
+.maint-layout {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: var(--space-6);
+}
+
+.maint-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.maint-section-header {
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.maint-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.maint-section-count {
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.maint-section-body {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+/* ── Maintenance Log Card ── */
+
+.maint-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  position: relative;
+  transition: all 0.25s var(--ease-default);
+  animation: staggerFadeIn 0.3s var(--ease-default) backwards;
+}
+.maint-card:hover {
+  border-color: var(--border-default);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.maint-card--active {
+  border-left: 3px solid var(--accent-amber);
+}
+.maint-card--closed {
+  border-left: 3px solid var(--accent-green);
+  opacity: 0.8;
+}
+
+.maint-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+.maint-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.maint-card-vehicle {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-blue);
+  margin-top: 2px;
+}
+
+.maint-card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2) var(--space-4);
+  margin-bottom: var(--space-3);
+}
+.maint-card-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.maint-card-field-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.maint-card-field-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.maint-card-field-value.mono {
+  font-family: var(--font-mono);
+}
+
+.maint-card-notes {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.maint-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ── Duration indicator ── */
+
+.maint-duration {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.maint-duration-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulseGlow 2s infinite;
+}
+.maint-duration-dot--active {
+  background: var(--accent-amber);
+  box-shadow: 0 0 8px rgba(255, 184, 0, 0.4);
+}
+
+/* ── Close Maintenance Modal ── */
+
+.close-maint-summary {
+  background: var(--bg-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-5);
+}
+.close-maint-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+  font-size: 14px;
+}
+.close-maint-summary-row:not(:last-child) {
+  border-bottom: 1px solid var(--border-subtle);
+}
+.close-maint-summary-label {
+  color: var(--text-muted);
+}
+.close-maint-summary-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ── Vehicle status indicator in card ── */
+
+.maint-vehicle-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.maint-vehicle-status--in-shop {
+  background: var(--accent-amber-muted);
+  color: var(--accent-amber);
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .maint-layout {
+    grid-template-columns: 1fr;
+  }
+  .maint-kpi-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .maint-kpi-strip {
+    grid-template-columns: 1fr;
+  }
+  .maint-card-body {
+    grid-template-columns: 1fr;
+  }
+}

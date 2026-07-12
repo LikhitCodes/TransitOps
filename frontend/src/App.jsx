@@ -4,6 +4,10 @@ import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import VehiclesPage from './pages/VehiclesPage'
 import DriversPage from './pages/DriversPage'
+import TripsPage from './pages/TripsPage'
+import MaintenancePage from './pages/MaintenancePage'
+import ExpensesPage from './pages/ExpensesPage'
+import ReportsPage from './pages/ReportsPage'
 import AppLayout from './components/Layout/AppLayout'
 
 function App() {
@@ -19,13 +23,14 @@ function App() {
       <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
 
-        {/* Placeholder routes — will be implemented per wireframe */}
         <Route path="/fleet" element={<VehiclesPage />} />
         <Route path="/drivers" element={<DriversPage />} />
-        <Route path="/trips" element={<PlaceholderPage title="Trip Planner" />} />
-        <Route path="/maintenance" element={<PlaceholderPage title="Maintenance" />} />
-        <Route path="/fuel-expenses" element={<PlaceholderPage title="Fuel & Expenses" />} />
-        <Route path="/analytics" element={<PlaceholderPage title="Analytics & Reports" />} />
+        <Route path="/trips" element={<TripsPage />} />
+        <Route path="/maintenance" element={<MaintenancePage />} />
+        <Route path="/fuel-expenses" element={<ExpensesPage />} />
+        <Route path="/analytics" element={<ReportsPage />} />
+        
+        {/* Placeholder routes */}
         <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
       </Route>
 
