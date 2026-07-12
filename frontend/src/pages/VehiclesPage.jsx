@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import StatusBadge from '../components/ui/StatusBadge';
 import Modal from '../components/ui/Modal';
-import { VEHICLES, VEHICLE_TYPES, VEHICLE_STATUSES } from '../data/mockData';
+import { VEHICLE_TYPES, VEHICLE_STATUSES } from '../data/mockData';
 import './VehiclesPage.css';
 
 const INITIAL_FORM = {
@@ -15,7 +15,31 @@ const INITIAL_FORM = {
 };
 
 export default function VehiclesPage() {
-  const [vehicles, setVehicles] = useState(VEHICLES);
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch vehicles from backend
+  const fetchVehicles = async () => {
+    try {
+      const token = JSON.parse(localStorage.getItem('transitops_user'))?.token;
+      const res = await fetch('http://127.0.0.1:8000/api/fleet/vehicles/', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const results = Array.isArray(data) ? data : (data.results || []);
+        setVehicles(results);
+      }
+    } catch (err) {
+      console.error("Failed to fetch vehicles", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useMemo(() => {
+    fetchVehicles();
+  }, []);
   const [typeFilter, setTypeFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,7 +64,7 @@ export default function VehiclesPage() {
     setFormError('');
   };
 
-  const handleAddVehicle = (e) => {
+  const handleAddVehicle = async (e) => {
     e.preventDefault();
 
     // Validate required fields
@@ -73,8 +97,7 @@ export default function VehiclesPage() {
       return;
     }
 
-    const newVehicle = {
-      id: vehicles.length + 1,
+    const newVehicleData = {
       registration_number: formData.registration_number.trim().toUpperCase(),
       model_name: formData.model_name.trim(),
       vehicle_type: formData.vehicle_type,
@@ -85,10 +108,30 @@ export default function VehiclesPage() {
       region: formData.region,
     };
 
-    setVehicles(prev => [newVehicle, ...prev]);
-    setFormData(INITIAL_FORM);
-    setFormError('');
-    setIsModalOpen(false);
+    try {
+      const token = JSON.parse(localStorage.getItem('transitops_user'))?.token;
+      const res = await fetch('http://127.0.0.1:8000/api/fleet/vehicles/', {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newVehicleData)
+      });
+
+      if (res.ok) {
+        const addedVehicle = await res.json();
+        setVehicles(prev => [addedVehicle, ...prev]);
+        setFormData(INITIAL_FORM);
+        setFormError('');
+        setIsModalOpen(false);
+      } else {
+        const errData = await res.json();
+        setFormError(errData.detail || errData.registration_number?.[0] || 'Failed to add vehicle.');
+      }
+    } catch (err) {
+      setFormError('Network error connecting to the server.');
+    }
   };
 
   const formatNumber = (num) => {
@@ -172,7 +215,11 @@ export default function VehiclesPage() {
             </tr>
           </thead>
           <tbody>
-            {filteredVehicles.length > 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan="7" className="vehicles-empty">Loading vehicles...</td>
+              </tr>
+            ) : filteredVehicles.length > 0 ? (
               filteredVehicles.map((vehicle, index) => (
                 <tr key={vehicle.id} style={{ animationDelay: `${index * 40}ms` }}>
                   <td className="cell-mono cell-reg">{vehicle.registration_number}</td>

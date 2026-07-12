@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import StatusBadge from '../components/ui/StatusBadge';
 import Modal from '../components/ui/Modal';
-import { DRIVERS } from '../data/mockData';
+// Removed mock DRIVERS import
 import './DriversPage.css';
 
 const DRIVER_STATUSES = ['All', 'Available', 'On Trip', 'Off Duty', 'Suspended'];
@@ -10,7 +10,7 @@ const LICENSE_CATEGORIES = ['LMV', 'HMV'];
 const INITIAL_FORM = {
   name: '',
   license_number: '',
-  license_category: 'LMV',
+  license_category: 'Class C',
   license_expiry: '',
   contact: '',
   safety_score: '',
@@ -43,7 +43,31 @@ function formatExpiry(dateStr) {
 }
 
 export default function DriversPage() {
-  const [drivers, setDrivers] = useState(DRIVERS);
+  const [drivers, setDrivers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch drivers from backend
+  const fetchDrivers = async () => {
+    try {
+      const token = JSON.parse(localStorage.getItem('transitops_user'))?.token;
+      const res = await fetch('http://127.0.0.1:8000/api/fleet/drivers/', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const results = Array.isArray(data) ? data : (data.results || []);
+        setDrivers(results);
+      }
+    } catch (err) {
+      console.error("Failed to fetch drivers", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useMemo(() => {
+    fetchDrivers();
+  }, []);
   const [statusFilter, setStatusFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -74,7 +98,7 @@ export default function DriversPage() {
     );
   };
 
-  const handleAddDriver = (e) => {
+  const handleAddDriver = async (e) => {
     e.preventDefault();
 
     if (!formData.name.trim()) {
@@ -106,22 +130,42 @@ export default function DriversPage() {
       return;
     }
 
-    const newDriver = {
-      id: drivers.length + 1,
+    const newDriverData = {
       name: formData.name.trim(),
       license_number: formData.license_number.trim().toUpperCase(),
       license_category: formData.license_category,
       license_expiry: formData.license_expiry,
-      contact: formData.contact.trim(),
+      contact_number: formData.contact.trim(), // Backend expects contact_number
       safety_score: Number(formData.safety_score) || 100,
       status: 'Available',
-      trips_completed: 0,
     };
 
-    setDrivers(prev => [newDriver, ...prev]);
-    setFormData(INITIAL_FORM);
-    setFormError('');
-    setIsModalOpen(false);
+    try {
+      const token = JSON.parse(localStorage.getItem('transitops_user'))?.token;
+      const res = await fetch('http://127.0.0.1:8000/api/fleet/drivers/', {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newDriverData)
+      });
+
+      if (res.ok) {
+        const addedDriver = await res.json();
+        // map backend field contact_number back to contact if needed for UI, or just use backend data
+        addedDriver.contact = addedDriver.contact_number;
+        setDrivers(prev => [addedDriver, ...prev]);
+        setFormData(INITIAL_FORM);
+        setFormError('');
+        setIsModalOpen(false);
+      } else {
+        const errData = await res.json();
+        setFormError(errData.detail || errData.license_number?.[0] || 'Failed to add driver.');
+      }
+    } catch (err) {
+      setFormError('Network error connecting to the server.');
+    }
   };
 
   return (
@@ -176,7 +220,11 @@ export default function DriversPage() {
             </tr>
           </thead>
           <tbody>
-            {filteredDrivers.length > 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan="8" className="drivers-empty">Loading drivers...</td>
+              </tr>
+            ) : filteredDrivers.length > 0 ? (
               filteredDrivers.map((driver, index) => {
                 const expiry = formatExpiry(driver.license_expiry);
                 return (
@@ -188,8 +236,8 @@ export default function DriversPage() {
                       {expiry.text}
                       {expiry.expired && <span className="expiry-tag">EXPIRED</span>}
                     </td>
-                    <td className="cell-contact">{driver.contact}</td>
-                    <td className="cell-mono">{driver.trips_completed}</td>
+                    <td className="cell-contact">{driver.contact_number || driver.contact}</td>
+                    <td className="cell-mono">{driver.trips_completed || 0}</td>
                     <td>
                       <span className={`safety-badge ${getSafetyClass(driver.safety_score)}`}>
                         {driver.safety_score}%
@@ -281,9 +329,10 @@ export default function DriversPage() {
                 value={formData.license_category}
                 onChange={(e) => handleFormChange('license_category', e.target.value)}
               >
-                {LICENSE_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
+                <option value="Class A">Class A</option>
+                <option value="Class B">Class B</option>
+                <option value="Class C">Class C</option>
+                <option value="Class D">Class D</option>
               </select>
             </div>
             <div className="form-group">

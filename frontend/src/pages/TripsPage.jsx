@@ -1,42 +1,7 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import './TripsPage.css';
 
-// ─── Mock Data ───────────────────────────────────────────────
-// Replace with API calls when backend is connected
-
-const MOCK_VEHICLES = [
-  { id: 1, registration_number: 'VAN-05', model_name: 'Ford Transit', vehicle_type: 'Van', max_load_capacity: 500, status: 'Available' },
-  { id: 2, registration_number: 'TRK-12', model_name: 'Volvo FH16', vehicle_type: 'Truck', max_load_capacity: 8000, status: 'Available' },
-  { id: 3, registration_number: 'PKP-03', model_name: 'Toyota Hilux', vehicle_type: 'Pickup', max_load_capacity: 1200, status: 'Available' },
-  { id: 4, registration_number: 'VAN-08', model_name: 'Mercedes Sprinter', vehicle_type: 'Van', max_load_capacity: 650, status: 'On Trip' },
-  { id: 5, registration_number: 'SEM-01', model_name: 'Scania R450', vehicle_type: 'Semi Trailer', max_load_capacity: 25000, status: 'In Shop' },
-];
-
-const MOCK_DRIVERS = [
-  { id: 1, name: 'Alex Johnson', license_number: 'DL-2024-001', license_expiry: '2027-06-15', safety_score: 95, status: 'Available' },
-  { id: 2, name: 'Maria Garcia', license_number: 'DL-2024-002', license_expiry: '2026-12-31', safety_score: 88, status: 'Available' },
-  { id: 3, name: 'James Wilson', license_number: 'DL-2024-003', license_expiry: '2025-03-20', safety_score: 72, status: 'On Trip' },
-  { id: 4, name: 'Sarah Chen', license_number: 'DL-2024-004', license_expiry: '2027-09-10', safety_score: 91, status: 'Available' },
-  { id: 5, name: 'Mike Brown', license_number: 'DL-2024-005', license_expiry: '2024-01-15', safety_score: 65, status: 'Suspended' },
-];
-
-const generateTripNumber = () => `TRP-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-
-const INITIAL_TRIPS = [
-  { id: 1, trip_number: 'TRP-A1B2C3D4', source: 'Mumbai', destination: 'Pune', vehicle_id: 1, driver_id: 1, cargo_weight: 350, planned_distance: 150, actual_distance: null, fuel_consumed: null, revenue: 12000, status: 'Draft', created_at: '2026-07-10T08:00:00', dispatched_at: null, completed_at: null },
-  { id: 2, trip_number: 'TRP-E5F6G7H8', source: 'Delhi', destination: 'Jaipur', vehicle_id: 2, driver_id: 2, cargo_weight: 5000, planned_distance: 280, actual_distance: null, fuel_consumed: null, revenue: 45000, status: 'Dispatched', created_at: '2026-07-09T10:30:00', dispatched_at: '2026-07-09T11:00:00', completed_at: null },
-  { id: 3, trip_number: 'TRP-I9J0K1L2', source: 'Bangalore', destination: 'Chennai', vehicle_id: 3, driver_id: 3, cargo_weight: 800, planned_distance: 350, actual_distance: 345, fuel_consumed: 42, revenue: 28000, status: 'Completed', created_at: '2026-07-08T06:00:00', dispatched_at: '2026-07-08T07:00:00', completed_at: '2026-07-08T18:30:00' },
-  { id: 4, trip_number: 'TRP-M3N4O5P6', source: 'Hyderabad', destination: 'Vizag', vehicle_id: 1, driver_id: 4, cargo_weight: 400, planned_distance: 620, actual_distance: 615, fuel_consumed: 68, revenue: 35000, status: 'Completed', created_at: '2026-07-07T09:00:00', dispatched_at: '2026-07-07T10:00:00', completed_at: '2026-07-07T22:00:00' },
-  { id: 5, trip_number: 'TRP-Q7R8S9T0', source: 'Kolkata', destination: 'Patna', vehicle_id: 2, driver_id: 1, cargo_weight: 6000, planned_distance: 590, actual_distance: null, fuel_consumed: null, revenue: 52000, status: 'Draft', created_at: '2026-07-11T14:00:00', dispatched_at: null, completed_at: null },
-  { id: 6, trip_number: 'TRP-U1V2W3X4', source: 'Ahmedabad', destination: 'Surat', vehicle_id: 3, driver_id: 2, cargo_weight: 950, planned_distance: 265, actual_distance: null, fuel_consumed: null, revenue: 18000, status: 'Cancelled', created_at: '2026-07-06T07:00:00', dispatched_at: '2026-07-06T08:00:00', completed_at: null },
-  { id: 7, trip_number: 'TRP-Y5Z6A7B8', source: 'Lucknow', destination: 'Varanasi', vehicle_id: 2, driver_id: 4, cargo_weight: 3200, planned_distance: 320, actual_distance: null, fuel_consumed: null, revenue: 29000, status: 'Dispatched', created_at: '2026-07-11T16:00:00', dispatched_at: '2026-07-11T17:00:00', completed_at: null },
-  { id: 8, trip_number: 'TRP-C9D0E1F2', source: 'Pune', destination: 'Goa', vehicle_id: 1, driver_id: 1, cargo_weight: 280, planned_distance: 460, actual_distance: 455, fuel_consumed: 50, revenue: 22000, status: 'Completed', created_at: '2026-07-05T05:30:00', dispatched_at: '2026-07-05T06:30:00', completed_at: '2026-07-05T19:00:00' },
-];
-
 // ─── Helper Functions ────────────────────────────────────────
-
-const getVehicle = (id) => MOCK_VEHICLES.find(v => v.id === id);
-const getDriver = (id) => MOCK_DRIVERS.find(d => d.id === id);
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '—';
@@ -63,8 +28,6 @@ const statusBadgeClass = (status) => {
 // ─── Sub-Components ──────────────────────────────────────────
 
 function TripCard({ trip, onDispatch, onComplete, onCancel, onClick }) {
-  const vehicle = getVehicle(trip.vehicle_id);
-  const driver = getDriver(trip.driver_id);
 
   return (
     <div className="trip-card" onClick={() => onClick(trip)} style={{ animationDelay: `${(trip.id % 5) * 60}ms` }}>
@@ -82,11 +45,11 @@ function TripCard({ trip, onDispatch, onComplete, onCancel, onClick }) {
       <div className="trip-card-details">
         <div className="trip-card-detail">
           <span className="trip-card-detail-icon">🚛</span>
-          <span className="trip-card-detail-value">{vehicle?.registration_number || '—'}</span>
+          <span className="trip-card-detail-value">{trip.vehicle_registration || '—'}</span>
         </div>
         <div className="trip-card-detail">
           <span className="trip-card-detail-icon">👤</span>
-          <span>{driver?.name || '—'}</span>
+          <span>{trip.driver_name || '—'}</span>
         </div>
         <div className="trip-card-detail">
           <span className="trip-card-detail-icon">📏</span>
@@ -96,7 +59,7 @@ function TripCard({ trip, onDispatch, onComplete, onCancel, onClick }) {
 
       <div className="trip-card-footer">
         <span className="trip-card-weight">
-          <strong>{trip.cargo_weight} kg</strong> / {vehicle?.max_load_capacity || '—'} kg
+          <strong>{trip.cargo_weight} kg</strong> / {trip.vehicle_capacity || '—'} kg
         </span>
         <div className="trip-card-actions" onClick={e => e.stopPropagation()}>
           {trip.status === 'Draft' && (
@@ -149,20 +112,20 @@ function KanbanColumn({ status, trips, colorClass, onDispatch, onComplete, onCan
 
 function NewTripModal({ onClose, onSubmit, vehicles, drivers }) {
   const [form, setForm] = useState({
-    source: '', destination: '', vehicle_id: '', driver_id: '',
+    source: '', destination: '', vehicle: '', driver: '',
     cargo_weight: '', planned_distance: '', revenue: ''
   });
   const [errors, setErrors] = useState({});
 
-  const selectedVehicle = vehicles.find(v => v.id === Number(form.vehicle_id));
+  const selectedVehicle = vehicles.find(v => v.id === Number(form.vehicle));
   const cargoWeight = Number(form.cargo_weight) || 0;
   const maxCapacity = selectedVehicle?.max_load_capacity || 0;
   const capacityRatio = maxCapacity ? (cargoWeight / maxCapacity) : 0;
 
   const capacityStatus = capacityRatio === 0 ? null
     : capacityRatio <= 0.75 ? 'ok'
-    : capacityRatio <= 1 ? 'warn'
-    : 'error';
+      : capacityRatio <= 1 ? 'warn'
+        : 'error';
 
   const availableVehicles = vehicles.filter(v => v.status === 'Available');
   const eligibleDrivers = drivers.filter(d => {
@@ -180,8 +143,8 @@ function NewTripModal({ onClose, onSubmit, vehicles, drivers }) {
     const errs = {};
     if (!form.source.trim()) errs.source = 'Source is required';
     if (!form.destination.trim()) errs.destination = 'Destination is required';
-    if (!form.vehicle_id) errs.vehicle_id = 'Select a vehicle';
-    if (!form.driver_id) errs.driver_id = 'Select a driver';
+    if (!form.vehicle) errs.vehicle = 'Select a vehicle';
+    if (!form.driver) errs.driver = 'Select a driver';
     if (!form.cargo_weight || Number(form.cargo_weight) <= 0) errs.cargo_weight = 'Enter valid cargo weight';
     if (!form.planned_distance || Number(form.planned_distance) <= 0) errs.planned_distance = 'Enter planned distance';
     if (selectedVehicle && cargoWeight > selectedVehicle.max_load_capacity) {
@@ -196,8 +159,8 @@ function NewTripModal({ onClose, onSubmit, vehicles, drivers }) {
     if (!validate()) return;
     onSubmit({
       ...form,
-      vehicle_id: Number(form.vehicle_id),
-      driver_id: Number(form.driver_id),
+      vehicle: Number(form.vehicle),
+      driver: Number(form.driver),
       cargo_weight: Number(form.cargo_weight),
       planned_distance: Number(form.planned_distance),
       revenue: Number(form.revenue) || 0,
@@ -244,8 +207,8 @@ function NewTripModal({ onClose, onSubmit, vehicles, drivers }) {
               <label className="input-label">Vehicle</label>
               <select
                 className="input-field"
-                value={form.vehicle_id}
-                onChange={e => handleChange('vehicle_id', e.target.value)}
+                value={form.vehicle}
+                onChange={e => handleChange('vehicle', e.target.value)}
               >
                 <option value="">Select vehicle...</option>
                 {availableVehicles.map(v => (
@@ -254,14 +217,14 @@ function NewTripModal({ onClose, onSubmit, vehicles, drivers }) {
                   </option>
                 ))}
               </select>
-              {errors.vehicle_id && <div className="form-error">{errors.vehicle_id}</div>}
+              {errors.vehicle && <div className="form-error">{errors.vehicle}</div>}
             </div>
             <div className="form-group">
               <label className="input-label">Driver</label>
               <select
                 className="input-field"
-                value={form.driver_id}
-                onChange={e => handleChange('driver_id', e.target.value)}
+                value={form.driver}
+                onChange={e => handleChange('driver', e.target.value)}
               >
                 <option value="">Select driver...</option>
                 {eligibleDrivers.map(d => (
@@ -270,7 +233,7 @@ function NewTripModal({ onClose, onSubmit, vehicles, drivers }) {
                   </option>
                 ))}
               </select>
-              {errors.driver_id && <div className="form-error">{errors.driver_id}</div>}
+              {errors.driver && <div className="form-error">{errors.driver}</div>}
             </div>
           </div>
 
@@ -345,8 +308,6 @@ function NewTripModal({ onClose, onSubmit, vehicles, drivers }) {
 }
 
 function CompleteTripModal({ trip, onClose, onSubmit }) {
-  const vehicle = getVehicle(trip.vehicle_id);
-  const driver = getDriver(trip.driver_id);
   const [form, setForm] = useState({
     actual_distance: trip.planned_distance || '',
     fuel_consumed: '',
@@ -403,12 +364,12 @@ function CompleteTripModal({ trip, onClose, onSubmit }) {
           </div>
           <div className="complete-trip-summary-item">
             <span className="complete-trip-summary-label">Vehicle</span>
-            <span className="complete-trip-summary-value">{vehicle?.registration_number}</span>
+            <span className="complete-trip-summary-value">{trip.vehicle_registration}</span>
           </div>
           <div className="complete-trip-summary-item">
             <span className="complete-trip-summary-label">Driver</span>
             <span className="complete-trip-summary-value" style={{ fontFamily: 'var(--font-primary)' }}>
-              {driver?.name}
+              {trip.driver_name}
             </span>
           </div>
         </div>
@@ -493,8 +454,6 @@ function ConfirmDialog({ title, message, icon, confirmLabel, confirmClass, onCon
 }
 
 function TripDetailPanel({ trip, onClose, onDispatch, onComplete, onCancel }) {
-  const vehicle = getVehicle(trip.vehicle_id);
-  const driver = getDriver(trip.driver_id);
 
   const timelineEvents = [
     { label: 'Created', date: trip.created_at, active: true },
@@ -543,11 +502,11 @@ function TripDetailPanel({ trip, onClose, onDispatch, onComplete, onCancel }) {
           <div className="trip-detail-grid">
             <div className="trip-detail-item">
               <div className="trip-detail-item-label">Vehicle</div>
-              <div className="trip-detail-item-value mono">{vehicle?.registration_number || '—'}</div>
+              <div className="trip-detail-item-value mono">{trip.vehicle_registration || '—'}</div>
             </div>
             <div className="trip-detail-item">
               <div className="trip-detail-item-label">Driver</div>
-              <div className="trip-detail-item-value">{driver?.name || '—'}</div>
+              <div className="trip-detail-item-value">{trip.driver_name || '—'}</div>
             </div>
             <div className="trip-detail-item">
               <div className="trip-detail-item-label">Cargo Weight</div>
@@ -640,14 +599,12 @@ function TripsTableView({ trips, onCardClick }) {
             </tr>
           ) : (
             trips.map(trip => {
-              const vehicle = getVehicle(trip.vehicle_id);
-              const driver = getDriver(trip.driver_id);
               return (
                 <tr key={trip.id} onClick={() => onCardClick(trip)}>
                   <td className="cell-mono">{trip.trip_number}</td>
                   <td>{trip.source} → {trip.destination}</td>
-                  <td className="cell-mono">{vehicle?.registration_number || '—'}</td>
-                  <td>{driver?.name || '—'}</td>
+                  <td className="cell-mono">{trip.vehicle_registration || '—'}</td>
+                  <td>{trip.driver_name || '—'}</td>
                   <td className="cell-mono">{trip.cargo_weight}</td>
                   <td className="cell-mono">{trip.actual_distance || trip.planned_distance}</td>
                   <td className="cell-mono">₹{trip.revenue?.toLocaleString() || '—'}</td>
@@ -683,7 +640,44 @@ function ToastContainer({ toasts, onRemove }) {
 // ═══════════════════════════════════════════════════════════════
 
 export default function TripsPage() {
-  const [trips, setTrips] = useState(INITIAL_TRIPS);
+  const [trips, setTrips] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+  const [drivers, setDrivers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAllData = useCallback(async () => {
+    try {
+      const token = JSON.parse(localStorage.getItem('transitops_user'))?.token;
+      const headers = { 'Authorization': `Bearer ${token}` };
+
+      const [tripsRes, vehRes, drvRes] = await Promise.all([
+        fetch('http://127.0.0.1:8000/api/trips/', { headers }),
+        fetch('http://127.0.0.1:8000/api/fleet/vehicles/', { headers }),
+        fetch('http://127.0.0.1:8000/api/fleet/drivers/', { headers }),
+      ]);
+
+      if (tripsRes.ok) {
+        const data = await tripsRes.json();
+        setTrips(Array.isArray(data) ? data : data.results || []);
+      }
+      if (vehRes.ok) {
+        const data = await vehRes.json();
+        setVehicles(Array.isArray(data) ? data : data.results || []);
+      }
+      if (drvRes.ok) {
+        const data = await drvRes.json();
+        setDrivers(Array.isArray(data) ? data : data.results || []);
+      }
+    } catch (err) {
+      console.error('Error fetching data:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAllData();
+  }, [fetchAllData]);
   const [view, setView] = useState('kanban'); // 'kanban' | 'table'
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -710,11 +704,9 @@ export default function TripsPage() {
       if (statusFilter !== 'all' && trip.status !== statusFilter) return false;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
-        const vehicle = getVehicle(trip.vehicle_id);
-        const driver = getDriver(trip.driver_id);
         const searchable = [
           trip.trip_number, trip.source, trip.destination,
-          vehicle?.registration_number, driver?.name
+          trip.vehicle_registration, trip.driver_name
         ].filter(Boolean).join(' ').toLowerCase();
         if (!searchable.includes(q)) return false;
       }
@@ -739,28 +731,32 @@ export default function TripsPage() {
   }), [trips]);
 
   // ── Trip Actions ──
-  const handleCreateTrip = useCallback((formData) => {
-    const newTrip = {
-      id: Date.now(),
-      trip_number: generateTripNumber(),
-      source: formData.source,
-      destination: formData.destination,
-      vehicle_id: formData.vehicle_id,
-      driver_id: formData.driver_id,
-      cargo_weight: formData.cargo_weight,
-      planned_distance: formData.planned_distance,
-      actual_distance: null,
-      fuel_consumed: null,
-      revenue: formData.revenue,
-      status: 'Draft',
-      created_at: new Date().toISOString(),
-      dispatched_at: null,
-      completed_at: null,
-    };
-    setTrips(prev => [newTrip, ...prev]);
-    setShowNewTripModal(false);
-    addToast(`Trip ${newTrip.trip_number} created successfully`, 'success');
-  }, [addToast]);
+  const getAuthHeaders = () => ({
+    'Authorization': `Bearer ${JSON.parse(localStorage.getItem('transitops_user'))?.token}`,
+    'Content-Type': 'application/json'
+  });
+
+  const handleCreateTrip = useCallback(async (formData) => {
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/trips/', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(formData)
+      });
+      if (res.ok) {
+        const newTrip = await res.json();
+        setTrips(prev => [newTrip, ...prev]);
+        setShowNewTripModal(false);
+        addToast(`Trip ${newTrip.trip_number} created successfully`, 'success');
+        fetchAllData(); // Refresh vehicles/drivers
+      } else {
+        const err = await res.json();
+        addToast(`Error: ${JSON.stringify(err)}`, 'error');
+      }
+    } catch (e) {
+      addToast('Network error', 'error');
+    }
+  }, [addToast, fetchAllData]);
 
   const handleDispatch = useCallback((trip) => {
     setConfirmAction({
@@ -769,53 +765,77 @@ export default function TripsPage() {
       icon: '🚀',
       confirmLabel: 'Dispatch',
       confirmClass: 'btn-primary',
-      onConfirm: () => {
-        setTrips(prev => prev.map(t =>
-          t.id === trip.id
-            ? { ...t, status: 'Dispatched', dispatched_at: new Date().toISOString() }
-            : t
-        ));
-        setConfirmAction(null);
-        setSelectedTrip(null);
-        addToast(`Trip ${trip.trip_number} dispatched — Vehicle & Driver now On Trip`, 'success');
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`http://127.0.0.1:8000/api/trips/${trip.id}/dispatch_trip/`, {
+            method: 'POST',
+            headers: getAuthHeaders()
+          });
+          if (res.ok) {
+            setConfirmAction(null);
+            setSelectedTrip(null);
+            addToast(`Trip ${trip.trip_number} dispatched`, 'success');
+            fetchAllData();
+          } else {
+            const err = await res.json();
+            addToast(`Error: ${err.error || JSON.stringify(err)}`, 'error');
+          }
+        } catch (e) {
+          addToast('Network error', 'error');
+        }
       },
     });
-  }, [addToast]);
+  }, [addToast, fetchAllData]);
 
-  const handleCompleteSubmit = useCallback((tripId, data) => {
-    setTrips(prev => prev.map(t =>
-      t.id === tripId
-        ? {
-            ...t,
-            status: 'Completed',
-            completed_at: new Date().toISOString(),
-            actual_distance: data.actual_distance,
-            fuel_consumed: data.fuel_consumed,
-          }
-        : t
-    ));
-    setCompletingTrip(null);
-    setSelectedTrip(null);
-    addToast('Trip completed — Vehicle & Driver restored to Available', 'success');
-  }, [addToast]);
+  const handleCompleteSubmit = useCallback(async (tripId, data) => {
+    try {
+      const res = await fetch(`http://127.0.0.1:8000/api/trips/${tripId}/complete_trip/`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        setCompletingTrip(null);
+        setSelectedTrip(null);
+        addToast('Trip completed', 'success');
+        fetchAllData();
+      } else {
+        const err = await res.json();
+        addToast(`Error: ${err.error || JSON.stringify(err)}`, 'error');
+      }
+    } catch (e) {
+      addToast('Network error', 'error');
+    }
+  }, [addToast, fetchAllData]);
 
   const handleCancel = useCallback((trip) => {
     setConfirmAction({
       title: 'Cancel Trip',
-      message: `Are you sure you want to cancel ${trip.trip_number}?${trip.status === 'Dispatched' ? ' The vehicle and driver will be restored to Available.' : ''}`,
+      message: `Are you sure you want to cancel ${trip.trip_number}?`,
       icon: '⚠️',
       confirmLabel: 'Cancel Trip',
       confirmClass: 'btn-danger',
-      onConfirm: () => {
-        setTrips(prev => prev.map(t =>
-          t.id === trip.id ? { ...t, status: 'Cancelled' } : t
-        ));
-        setConfirmAction(null);
-        setSelectedTrip(null);
-        addToast(`Trip ${trip.trip_number} cancelled`, 'warning');
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`http://127.0.0.1:8000/api/trips/${trip.id}/cancel_trip/`, {
+            method: 'POST',
+            headers: getAuthHeaders()
+          });
+          if (res.ok) {
+            setConfirmAction(null);
+            setSelectedTrip(null);
+            addToast(`Trip ${trip.trip_number} cancelled`, 'warning');
+            fetchAllData();
+          } else {
+            const err = await res.json();
+            addToast(`Error: ${err.error || JSON.stringify(err)}`, 'error');
+          }
+        } catch (e) {
+          addToast('Network error', 'error');
+        }
       },
     });
-  }, [addToast]);
+  }, [addToast, fetchAllData]);
 
   return (
     <div className="trips-page grid-bg">
@@ -915,8 +935,8 @@ export default function TripsPage() {
         <NewTripModal
           onClose={() => setShowNewTripModal(false)}
           onSubmit={handleCreateTrip}
-          vehicles={MOCK_VEHICLES}
-          drivers={MOCK_DRIVERS}
+          vehicles={vehicles}
+          drivers={drivers}
         />
       )}
 

@@ -1,28 +1,5 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import './MaintenancePage.css';
-
-// ─── Mock Data ───────────────────────────────────────────────
-
-const MOCK_VEHICLES = [
-  { id: 1, registration_number: 'VAN-05', model_name: 'Ford Transit', status: 'Available' },
-  { id: 2, registration_number: 'TRK-12', model_name: 'Volvo FH16', status: 'Available' },
-  { id: 3, registration_number: 'PKP-03', model_name: 'Toyota Hilux', status: 'In Shop' },
-  { id: 4, registration_number: 'VAN-08', model_name: 'Mercedes Sprinter', status: 'On Trip' },
-  { id: 5, registration_number: 'SEM-01', model_name: 'Scania R450', status: 'In Shop' },
-  { id: 6, registration_number: 'TRK-07', model_name: 'MAN TGX', status: 'Available' },
-];
-
-const INITIAL_LOGS = [
-  { id: 1, vehicle_id: 3, description: 'Engine Oil Change', cost: 4500, scheduled_date: '2026-07-10', completed_date: null, status: 'Active', notes: 'Scheduled routine maintenance. Using synthetic 5W-30 oil.', created_at: '2026-07-10T08:00:00' },
-  { id: 2, vehicle_id: 5, description: 'Brake Pad Replacement', cost: 12000, scheduled_date: '2026-07-09', completed_date: null, status: 'Active', notes: 'Front and rear brake pads worn below minimum thickness.', created_at: '2026-07-09T10:00:00' },
-  { id: 3, vehicle_id: 1, description: 'Tire Rotation & Alignment', cost: 3200, scheduled_date: '2026-07-05', completed_date: '2026-07-06', status: 'Closed', notes: 'All four tires rotated. Alignment adjusted.', created_at: '2026-07-04T14:00:00' },
-  { id: 4, vehicle_id: 2, description: 'Transmission Fluid Flush', cost: 8500, scheduled_date: '2026-07-03', completed_date: '2026-07-04', status: 'Closed', notes: 'Full transmission flush and filter replacement.', created_at: '2026-07-02T09:00:00' },
-  { id: 5, vehicle_id: 4, description: 'AC Compressor Repair', cost: 15000, scheduled_date: '2026-07-01', completed_date: '2026-07-02', status: 'Closed', notes: 'Compressor replaced. Refrigerant recharged.', created_at: '2026-06-30T11:00:00' },
-  { id: 6, vehicle_id: 6, description: 'Battery Replacement', cost: 6000, scheduled_date: '2026-06-28', completed_date: '2026-06-28', status: 'Closed', notes: 'Old battery failed load test. Replaced with new 75Ah unit.', created_at: '2026-06-27T16:00:00' },
-  { id: 7, vehicle_id: 1, description: 'Windshield Wiper Replacement', cost: 800, scheduled_date: '2026-06-25', completed_date: '2026-06-25', status: 'Closed', notes: '', created_at: '2026-06-25T08:00:00' },
-];
-
-const getVehicle = (id) => MOCK_VEHICLES.find(v => v.id === id);
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '—';
@@ -36,8 +13,8 @@ const daysSince = (dateStr) => {
 
 // ─── Sub-Components ──────────────────────────────────────────
 
-function MaintenanceCard({ log, onClose }) {
-  const vehicle = getVehicle(log.vehicle_id);
+function MaintenanceCard({ log, vehicles, onClose }) {
+  const vehicle = vehicles.find(v => v.id === log.vehicle) || { registration_number: log.vehicle_registration };
   const isActive = log.status === 'Active';
   const days = isActive ? daysSince(log.scheduled_date) : null;
 
@@ -99,7 +76,7 @@ function MaintenanceCard({ log, onClose }) {
 
 function NewMaintenanceModal({ onClose, onSubmit, vehicles }) {
   const [form, setForm] = useState({
-    vehicle_id: '', description: '', cost: '', scheduled_date: '', notes: ''
+    vehicle: '', description: '', cost: '', scheduled_date: '', notes: ''
   });
   const [errors, setErrors] = useState({});
 
@@ -113,7 +90,7 @@ function NewMaintenanceModal({ onClose, onSubmit, vehicles }) {
 
   const validate = () => {
     const errs = {};
-    if (!form.vehicle_id) errs.vehicle_id = 'Select a vehicle';
+    if (!form.vehicle) errs.vehicle = 'Select a vehicle';
     if (!form.description.trim()) errs.description = 'Description is required';
     if (!form.cost || Number(form.cost) <= 0) errs.cost = 'Enter estimated cost';
     if (!form.scheduled_date) errs.scheduled_date = 'Select a date';
@@ -126,7 +103,7 @@ function NewMaintenanceModal({ onClose, onSubmit, vehicles }) {
     if (!validate()) return;
     onSubmit({
       ...form,
-      vehicle_id: Number(form.vehicle_id),
+      vehicle: Number(form.vehicle),
       cost: Number(form.cost),
     });
   };
@@ -142,7 +119,7 @@ function NewMaintenanceModal({ onClose, onSubmit, vehicles }) {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="input-label">Vehicle</label>
-            <select className="input-field" value={form.vehicle_id} onChange={e => handleChange('vehicle_id', e.target.value)}>
+            <select className="input-field" value={form.vehicle} onChange={e => handleChange('vehicle', e.target.value)}>
               <option value="">Select vehicle...</option>
               {availableForMaint.map(v => (
                 <option key={v.id} value={v.id}>
@@ -150,7 +127,7 @@ function NewMaintenanceModal({ onClose, onSubmit, vehicles }) {
                 </option>
               ))}
             </select>
-            {errors.vehicle_id && <div className="form-error">{errors.vehicle_id}</div>}
+            {errors.vehicle && <div className="form-error">{errors.vehicle}</div>}
           </div>
 
           <div className="form-group">
@@ -211,8 +188,8 @@ function NewMaintenanceModal({ onClose, onSubmit, vehicles }) {
   );
 }
 
-function CloseMaintenanceModal({ log, onClose, onSubmit }) {
-  const vehicle = getVehicle(log.vehicle_id);
+function CloseMaintenanceModal({ log, vehicles, onClose, onSubmit }) {
+  const vehicle = vehicles.find(v => v.id === log.vehicle) || { registration_number: log.vehicle_registration };
   const [form, setForm] = useState({
     cost: log.cost || '',
     completed_date: new Date().toISOString().split('T')[0],
@@ -322,7 +299,8 @@ function ToastContainer({ toasts, onRemove }) {
 // ═══════════════════════════════════════════════════════════════
 
 export default function MaintenancePage() {
-  const [logs, setLogs] = useState(INITIAL_LOGS);
+  const [logs, setLogs] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
   const [showNewModal, setShowNewModal] = useState(false);
   const [closingLog, setClosingLog] = useState(null);
   const [toasts, setToasts] = useState([]);
@@ -337,6 +315,33 @@ export default function MaintenancePage() {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
+  const fetchAllData = useCallback(async () => {
+    try {
+      const token = JSON.parse(localStorage.getItem('transitops_user'))?.token;
+      const headers = { 'Authorization': `Bearer ${token}` };
+
+      const [logsRes, vehRes] = await Promise.all([
+        fetch('http://127.0.0.1:8000/api/maintenance/', { headers }),
+        fetch('http://127.0.0.1:8000/api/fleet/vehicles/', { headers }),
+      ]);
+
+      if (logsRes.ok) {
+        const data = await logsRes.json();
+        setLogs(Array.isArray(data) ? data : data.results || []);
+      }
+      if (vehRes.ok) {
+        const data = await vehRes.json();
+        setVehicles(Array.isArray(data) ? data : data.results || []);
+      }
+    } catch (err) {
+      console.error('Error fetching data:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAllData();
+  }, [fetchAllData]);
+
   const activeLogs = useMemo(() => logs.filter(l => l.status === 'Active'), [logs]);
   const closedLogs = useMemo(() => logs.filter(l => l.status === 'Closed'), [logs]);
 
@@ -344,36 +349,53 @@ export default function MaintenancePage() {
     active: activeLogs.length,
     closed: closedLogs.length,
     totalCost: logs.reduce((sum, l) => sum + l.cost, 0),
-    vehiclesInShop: new Set(activeLogs.map(l => l.vehicle_id)).size,
+    vehiclesInShop: new Set(activeLogs.map(l => l.vehicle)).size,
   }), [logs, activeLogs, closedLogs]);
 
-  const handleCreateMaintenance = useCallback((formData) => {
-    const newLog = {
-      id: Date.now(),
-      vehicle_id: formData.vehicle_id,
-      description: formData.description,
-      cost: formData.cost,
-      scheduled_date: formData.scheduled_date,
-      completed_date: null,
-      status: 'Active',
-      notes: formData.notes || '',
-      created_at: new Date().toISOString(),
-    };
-    setLogs(prev => [newLog, ...prev]);
-    setShowNewModal(false);
-    const vehicle = getVehicle(formData.vehicle_id);
-    addToast(`Maintenance logged for ${vehicle?.registration_number} — Vehicle now In Shop`, 'success');
-  }, [addToast]);
+  const getAuthHeaders = () => ({
+    'Authorization': `Bearer ${JSON.parse(localStorage.getItem('transitops_user'))?.token}`,
+    'Content-Type': 'application/json'
+  });
 
-  const handleCloseMaintenance = useCallback((logId, data) => {
-    setLogs(prev => prev.map(l =>
-      l.id === logId
-        ? { ...l, status: 'Closed', cost: data.cost, completed_date: data.completed_date }
-        : l
-    ));
-    setClosingLog(null);
-    addToast('Maintenance closed — Vehicle restored to Available', 'success');
-  }, [addToast]);
+  const handleCreateMaintenance = useCallback(async (formData) => {
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/maintenance/', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(formData)
+      });
+      if (res.ok) {
+        setShowNewModal(false);
+        addToast('Maintenance logged successfully', 'success');
+        fetchAllData();
+      } else {
+        const err = await res.json();
+        addToast(`Error: ${JSON.stringify(err)}`, 'error');
+      }
+    } catch (e) {
+      addToast('Network error', 'error');
+    }
+  }, [addToast, fetchAllData]);
+
+  const handleCloseMaintenance = useCallback(async (logId, data) => {
+    try {
+      const res = await fetch(`http://127.0.0.1:8000/api/maintenance/${logId}/close/`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        setClosingLog(null);
+        addToast('Maintenance closed — Vehicle restored to Available', 'success');
+        fetchAllData();
+      } else {
+        const err = await res.json();
+        addToast(`Error: ${JSON.stringify(err)}`, 'error');
+      }
+    } catch (e) {
+      addToast('Network error', 'error');
+    }
+  }, [addToast, fetchAllData]);
 
   return (
     <div className="maintenance-page grid-bg">
@@ -426,7 +448,7 @@ export default function MaintenancePage() {
                 </div>
               ) : (
                 activeLogs.map(log => (
-                  <MaintenanceCard key={log.id} log={log} onClose={setClosingLog} />
+                  <MaintenanceCard key={log.id} log={log} vehicles={vehicles} onClose={setClosingLog} />
                 ))
               )}
             </div>
@@ -446,7 +468,7 @@ export default function MaintenancePage() {
                 </div>
               ) : (
                 closedLogs.map(log => (
-                  <MaintenanceCard key={log.id} log={log} onClose={() => {}} />
+                  <MaintenanceCard key={log.id} log={log} vehicles={vehicles} onClose={() => { }} />
                 ))
               )}
             </div>
@@ -459,12 +481,13 @@ export default function MaintenancePage() {
         <NewMaintenanceModal
           onClose={() => setShowNewModal(false)}
           onSubmit={handleCreateMaintenance}
-          vehicles={MOCK_VEHICLES}
+          vehicles={vehicles}
         />
       )}
       {closingLog && (
         <CloseMaintenanceModal
           log={closingLog}
+          vehicles={vehicles}
           onClose={() => setClosingLog(null)}
           onSubmit={handleCloseMaintenance}
         />
