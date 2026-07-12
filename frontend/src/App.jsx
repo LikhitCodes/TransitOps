@@ -1,121 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import LandingPage from './pages/LandingPage'
+import LoginPage from './pages/LoginPage'
+import DashboardPage from './pages/DashboardPage'
+import VehiclesPage from './pages/VehiclesPage'
+import DriversPage from './pages/DriversPage'
+import TripsPage from './pages/TripsPage'
+import MaintenancePage from './pages/MaintenancePage'
+import ExpensesPage from './pages/ExpensesPage'
+import ReportsPage from './pages/ReportsPage'
+import AppLayout from './components/Layout/AppLayout'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <Routes>
+      {/* Root — Landing page */}
+      <Route path="/" element={<LandingPage />} />
 
-      <div className="ticks"></div>
+      {/* Public routes */}
+      <Route path="/login" element={<LoginPage />} />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      {/* Authenticated routes — wrapped in AppLayout (Sidebar + Topbar) */}
+      <Route element={<AppLayout />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        <Route path="/fleet" element={<VehiclesPage />} />
+        <Route path="/drivers" element={<DriversPage />} />
+        <Route path="/trips" element={<TripsPage />} />
+        <Route path="/maintenance" element={<MaintenancePage />} />
+        <Route path="/fuel-expenses" element={<ExpensesPage />} />
+        <Route path="/analytics" element={<ReportsPage />} />
+        
+        {/* Placeholder routes */}
+        <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
+      </Route>
+
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  )
+}
+
+/**
+ * Temporary placeholder for pages not yet built.
+ * Will be replaced with real components as wireframes are provided.
+ */
+function PlaceholderPage({ title }) {
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '60vh',
+      gap: '16px',
+    }}>
+      <h1 style={{
+        fontSize: '32px',
+        fontWeight: 700,
+        color: 'var(--text-primary)',
+        letterSpacing: '-0.02em',
+      }}>
+        {title}
+      </h1>
+      <p style={{
+        fontSize: '15px',
+        color: 'var(--text-muted)',
+      }}>
+        Coming soon — provide the wireframe to build this page.
+      </p>
+    </div>
   )
 }
 

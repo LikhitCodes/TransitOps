@@ -1,0 +1,167 @@
+/* ═══════════════════════════════════════════════════
+   DashboardPage — Layout & component styles
+   ═══════════════════════════════════════════════════ */
+
+.dashboard-page {
+  animation: fadeIn 0.4s var(--ease-default);
+}
+
+/* ── KPI Row ── */
+.dashboard-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+/* Staggered animation for KPI cards */
+.dashboard-kpi-row .kpi-card:nth-child(1) { animation-delay: 0ms; }
+.dashboard-kpi-row .kpi-card:nth-child(2) { animation-delay: 60ms; }
+.dashboard-kpi-row .kpi-card:nth-child(3) { animation-delay: 120ms; }
+.dashboard-kpi-row .kpi-card:nth-child(4) { animation-delay: 180ms; }
+.dashboard-kpi-row .kpi-card:nth-child(5) { animation-delay: 240ms; }
+.dashboard-kpi-row .kpi-card:nth-child(6) { animation-delay: 300ms; }
+.dashboard-kpi-row .kpi-card:nth-child(7) { animation-delay: 360ms; }
+
+
+/* ── Bottom Section ── */
+.dashboard-bottom {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: var(--space-6);
+}
+
+.dashboard-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-4);
+}
+
+
+/* ── Recent Trips Table ── */
+.dashboard-recent-trips {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+.dashboard-table-wrapper {
+  overflow-x: auto;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.dashboard-table thead th {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.dashboard-table tbody td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.15s ease;
+}
+
+.dashboard-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.dashboard-table tbody tr:hover td {
+  background: var(--bg-subtle);
+}
+
+.dashboard-table .cell-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dashboard-table .cell-muted {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+
+/* ── Vehicle Status Bars ── */
+.dashboard-vehicle-status {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+.status-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.status-bar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.status-bar-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  width: 90px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.status-bar-track {
+  flex: 1;
+  height: 20px;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.status-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  transition: width 0.8s var(--ease-default);
+  animation: statusBarGrow 1s var(--ease-default) both;
+}
+
+@keyframes statusBarGrow {
+  from { width: 0 !important; }
+}
+
+
+/* ── Responsive ── */
+@media (max-width: 1200px) {
+  .dashboard-kpi-row {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .dashboard-bottom {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -1,0 +1,333 @@
+/* ═══════════════════════════════════════════════════
+   DriversPage — Drivers & Safety Profiles
+   ═══════════════════════════════════════════════════ */
+
+.drivers-page {
+  animation: fadeIn 0.4s var(--ease-default);
+}
+
+/* ── Action Bar ── */
+.drivers-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.drivers-filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.drivers-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.drivers-search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.drivers-search-input {
+  background: var(--bg-subtle);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px 8px 32px;
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s ease;
+  width: 260px;
+}
+
+.drivers-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.drivers-search-input:focus {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 0 3px rgba(0, 224, 90, 0.1);
+}
+
+.drivers-search-input:hover:not(:focus) {
+  border-color: var(--border-strong);
+}
+
+.drivers-add-btn {
+  background: var(--accent-green);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 10px 24px;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-default);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.drivers-add-btn:hover {
+  background: var(--accent-green-hover);
+  box-shadow: var(--shadow-green-glow);
+  transform: translateY(-1px);
+}
+
+
+/* ── Data Table ── */
+.drivers-table-container {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.drivers-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.drivers-table thead th {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  position: sticky;
+  top: 0;
+  white-space: nowrap;
+}
+
+.drivers-table tbody tr {
+  animation: staggerFadeIn 0.4s var(--ease-default) both;
+}
+
+.drivers-table tbody td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.15s ease;
+}
+
+.drivers-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.drivers-table tbody tr:hover td {
+  background: var(--bg-subtle);
+}
+
+/* Cell variants */
+.drivers-table .cell-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.drivers-table .cell-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.drivers-table .cell-contact {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Expiry cell */
+.drivers-table .cell-expiry {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.drivers-table .cell-expiry.expired {
+  color: var(--accent-red);
+}
+
+.expiry-tag {
+  display: inline-block;
+  margin-left: var(--space-2);
+  background: var(--accent-red-muted);
+  color: var(--accent-red);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  vertical-align: middle;
+  text-transform: uppercase;
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Safety score badge */
+.safety-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  min-width: 56px;
+  text-align: center;
+}
+
+.safety-green {
+  background: var(--accent-green-muted);
+  color: var(--accent-green);
+}
+
+.safety-amber {
+  background: var(--accent-amber-muted);
+  color: var(--accent-amber);
+}
+
+.safety-red {
+  background: var(--accent-red-muted);
+  color: var(--accent-red);
+}
+
+
+/* ── Toggle Status Section ── */
+.drivers-toggle-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.drivers-toggle-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.drivers-toggle-pills {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.toggle-pill {
+  background: none;
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-default);
+  overflow: hidden;
+}
+
+.toggle-pill:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.toggle-pill.active {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
+}
+
+.toggle-pill .status-badge {
+  animation: none;
+}
+
+
+/* ── Rule Note ── */
+.drivers-rule-note {
+  margin-top: var(--space-4);
+  font-size: 12px;
+  color: var(--accent-amber);
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
+.drivers-rule-note .rule-prefix {
+  font-weight: 700;
+}
+
+
+/* ── Form Error ── */
+.drivers-form-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--accent-red-muted);
+  border: 1px solid rgba(255, 59, 59, 0.3);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent-red);
+  animation: slideUp 0.3s var(--ease-spring);
+}
+
+.drivers-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--space-12) var(--space-4) !important;
+  font-size: 14px;
+}
+
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .drivers-action-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .drivers-add-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .drivers-table-container {
+    overflow-x: auto;
+  }
+
+  .drivers-table {
+    min-width: 900px;
+  }
+}
+
+@media (max-width: 640px) {
+  .drivers-filters {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .drivers-search-input {
+    width: 100%;
+  }
+
+  .drivers-toggle-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
