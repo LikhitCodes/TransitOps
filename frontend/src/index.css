@@ -36,15 +36,15 @@
   --accent-green-glow:   none;
 
   /* ── Accent: Orange (Warning) ── */
-  --accent-orange:       #FFA500;
-  --accent-orange-hover: #CC8400;
-  --accent-orange-muted: rgba(255, 165, 0, 0.08);
+  --accent-orange:       #D96600;
+  --accent-orange-hover: #B35500;
+  --accent-orange-muted: rgba(217, 102, 0, 0.08);
   --accent-orange-glow:  none;
 
   /* ── Accent: Amber (Warning alias) ── */
-  --accent-amber:        #FFA500;
-  --accent-amber-hover:  #CC8400;
-  --accent-amber-muted:  rgba(255, 165, 0, 0.08);
+  --accent-amber:        #D96600;
+  --accent-amber-hover:  #B35500;
+  --accent-amber-muted:  rgba(217, 102, 0, 0.08);
 
   /* ── Accent: Blue (Links/Info only) ── */
   --accent-blue:         #0000FF;
