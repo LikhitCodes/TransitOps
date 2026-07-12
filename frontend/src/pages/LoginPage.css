@@ -233,8 +233,8 @@
 }
 
 .form-input:focus {
-  border-color: var(--accent-green);
-  box-shadow: 0 0 0 3px rgba(0, 224, 90, 0.1);
+  border-color: #000000;
+  /* no glow */
 }
 
 .form-input:hover:not(:focus) {
@@ -243,7 +243,7 @@
 
 .form-input.input-error {
   border-color: var(--accent-red);
-  box-shadow: 0 0 0 3px var(--accent-red-muted);
+  /* no glow */
 }
 
 
@@ -304,8 +304,8 @@
 }
 
 .form-select:focus {
-  border-color: var(--accent-green);
-  box-shadow: 0 0 0 3px rgba(0, 224, 90, 0.1);
+  border-color: #000000;
+  /* no glow */
 }
 
 .form-select:hover:not(:focus) {
@@ -379,7 +379,7 @@
 
 .login-submit-btn:hover:not(:disabled) {
   background: var(--accent-amber-hover);
-  box-shadow: 0 0 20px rgba(255, 184, 0, 0.3), 0 0 60px rgba(255, 184, 0, 0.1);
+  /* no shadow */
   transform: translateY(-1px);
 }
 

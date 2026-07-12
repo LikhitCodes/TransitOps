@@ -5,8 +5,8 @@
 .sidebar {
   width: var(--sidebar-width);
   height: 100vh;
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border-subtle);
+  background: #FFFFFF;
+  border-right: 2px solid var(--border-default);
   position: fixed;
   left: 0;
   top: 0;
@@ -18,7 +18,7 @@
 
 .sidebar-header {
   padding: var(--space-6) var(--space-5);
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 2px solid var(--border-default);
 }
 
 .sidebar-brand {
@@ -53,7 +53,7 @@
 }
 
 .sidebar-link:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.03);
   color: var(--text-primary);
 }
 
@@ -90,7 +90,7 @@
 
 .sidebar-footer {
   padding: var(--space-4) var(--space-5);
-  border-top: 1px solid var(--border-subtle);
+  border-top: 2px solid var(--border-default);
 }
 
 .sidebar-logout {

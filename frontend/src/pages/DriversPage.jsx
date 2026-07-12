@@ -219,10 +219,10 @@ export default function DriversPage() {
         </div>
       </div>
 
-      {/* ── Rule Note ── */}
+      {/* ── Rule Note ──
       <p className="drivers-rule-note">
         <span className="rule-prefix">Rule:</span> Expired license or Suspended status → blocked from trip assignment
-      </p>
+      </p> */}
 
       {/* ── Add Driver Modal ── */}
       <Modal

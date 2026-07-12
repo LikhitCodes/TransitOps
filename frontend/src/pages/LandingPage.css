@@ -120,7 +120,7 @@
 
 .landing-nav-cta:hover {
   background: var(--accent-green-hover);
-  box-shadow: var(--shadow-green-glow);
+  /* no shadow */
   transform: translateY(-1px);
 }
 
@@ -257,7 +257,7 @@
 
 .landing-btn-primary:hover {
   background: var(--accent-green-hover);
-  box-shadow: 0 0 40px rgba(0, 224, 90, 0.3);
+  /* no shadow */
   transform: translateY(-2px);
 }
 
@@ -453,7 +453,7 @@
 .landing-feature-card:hover {
   border-color: var(--border-default);
   transform: translateY(-4px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  /* no shadow */
 }
 
 /* Subtle gradient corner on hover */
@@ -625,7 +625,7 @@
 .landing-role-card:hover {
   border-color: var(--border-light-strong);
   transform: translateY(-4px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  /* no shadow */
 }
 
 .role-icon {

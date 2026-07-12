@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════ */
 
 .reports-page {
-  min-height: 100vh;
+  /* min-height handled by AppLayout */
   background: var(--bg-base);
 }
 
@@ -12,12 +12,12 @@
 .report-tabs {
   display: flex;
   gap: 2px;
-  margin-bottom: var(--space-8);
+  margin-bottom: 24px;
   background: var(--bg-subtle);
-  border-radius: var(--radius-pill);
+  border-radius: 0;
   padding: 3px;
   width: fit-content;
-  border: 1px solid var(--border-subtle);
+  border: 2px solid var(--border-default);
 }
 .report-tab {
   background: transparent;
@@ -28,7 +28,7 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  border-radius: var(--radius-pill);
+  border-radius: 0;
   transition: all 0.2s ease;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -37,9 +37,9 @@
   color: var(--text-secondary);
 }
 .report-tab.active {
-  background: var(--bg-elevated);
+  background: #FFFFFF;
   color: var(--accent-green);
-  box-shadow: var(--shadow-sm);
+  /* no shadow */
 }
 
 /* ── Headline Stat Card ── */
@@ -47,15 +47,15 @@
 .report-headline {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-4);
-  margin-bottom: var(--space-6);
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .report-stat-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5) var(--space-6);
+  background: #FFFFFF;
+  border: 2px solid var(--border-default);
+  border-radius: 0;
+  padding: 16px 20px;
   position: relative;
   overflow: hidden;
   transition: all 0.3s var(--ease-default);
@@ -70,8 +70,8 @@
 }
 .report-stat-card:hover {
   border-color: var(--border-default);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card-hover);
+  /* no lift */
+  /* no shadow */
 }
 .report-stat-card--green::before  { background: var(--accent-green); }
 .report-stat-card--blue::before   { background: var(--accent-blue); }
@@ -98,17 +98,17 @@
 /* ── Chart Container ── */
 
 .report-chart-container {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  background: #FFFFFF;
+  border: 2px solid var(--border-default);
+  border-radius: 0;
   padding: var(--space-6);
-  margin-bottom: var(--space-6);
+  margin-bottom: 20px;
 }
 .report-chart-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-5);
+  margin-bottom: 16px;
 }
 .report-chart-title {
   font-size: 16px;
@@ -125,10 +125,10 @@
 .bar-chart {
   display: flex;
   align-items: flex-end;
-  gap: var(--space-3);
+  gap: 12px;
   height: 260px;
   padding: var(--space-4) 0;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 2px solid var(--border-default);
 }
 
 .bar-chart-item {
@@ -181,7 +181,7 @@
 .h-bar-chart {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: 16px;
   padding: var(--space-4) 0;
 }
 
@@ -189,7 +189,7 @@
   display: grid;
   grid-template-columns: 120px 1fr 80px;
   align-items: center;
-  gap: var(--space-4);
+  gap: 16px;
 }
 .h-bar-label {
   font-family: var(--font-mono);
@@ -203,13 +203,13 @@
 .h-bar-track {
   height: 24px;
   background: var(--bg-subtle);
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   overflow: hidden;
   position: relative;
 }
 .h-bar-fill {
   height: 100%;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   transition: width 1s var(--ease-default);
   display: flex;
   align-items: center;
@@ -262,12 +262,12 @@
 .donut-legend {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 12px;
 }
 .donut-legend-item {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: 12px;
 }
 .donut-legend-dot {
   width: 10px;
@@ -290,9 +290,9 @@
 /* ── Data Table under charts ── */
 
 .report-table-container {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  background: #FFFFFF;
+  border: 2px solid var(--border-default);
+  border-radius: 0;
   overflow: hidden;
 }
 
@@ -309,16 +309,16 @@
 
 .report-formula {
   background: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: var(--space-4) var(--space-5);
+  border: 2px solid var(--border-default);
+  border-radius: 0;
+  padding: 16px 20px;
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--text-secondary);
-  margin-bottom: var(--space-6);
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: 12px;
 }
 .report-formula-label {
   font-family: var(--font-primary);
