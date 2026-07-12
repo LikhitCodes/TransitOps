@@ -188,10 +188,10 @@ export default function VehiclesPage() {
         </table>
       </div>
 
-      {/* ── Rule Note ── */}
+      {/* ── Rule Note ──
       <p className="vehicles-rule-note">
         <span className="rule-prefix">Rule:</span> Registration No. must be unique · Retired/In Shop vehicles are hidden from Trip Dispatcher
-      </p>
+      </p> */}
 
       {/* ── Add Vehicle Modal ── */}
       <Modal

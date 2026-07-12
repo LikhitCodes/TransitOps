@@ -26,9 +26,9 @@
 }
 
 .filter-select {
-  background: var(--bg-subtle);
-  border: 1.5px solid var(--border-default);
-  border-radius: var(--radius-sm);
+  background: #FFFFFF;
+  border: 2px solid var(--border-default);
+  border-radius: 0;
   padding: 8px 32px 8px 12px;
   color: var(--text-primary);
   font-family: var(--font-primary);
@@ -46,7 +46,7 @@
 }
 
 .filter-select:focus {
-  border-color: var(--accent-green);
+  border-color: #000000;
   box-shadow: 0 0 0 3px rgba(0, 224, 90, 0.1);
 }
 
@@ -55,7 +55,7 @@
 }
 
 .filter-select option {
-  background: var(--bg-elevated);
+  background: #FFFFFF;
   color: var(--text-primary);
 }
 

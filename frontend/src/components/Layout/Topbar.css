@@ -4,8 +4,8 @@
 
 .topbar {
   height: var(--topbar-height);
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border-subtle);
+  background: #FFFFFF;
+  border-bottom: 2px solid var(--border-default);
   position: fixed;
   top: 0;
   left: var(--sidebar-width);
@@ -38,8 +38,8 @@
 .topbar-search-input {
   width: 100%;
   background: var(--bg-subtle);
-  border: 1.5px solid var(--border-default);
-  border-radius: var(--radius-sm);
+  border: 2px solid var(--border-default);
+  border-radius: 0;
   padding: 8px 12px 8px 36px;
   color: var(--text-primary);
   font-family: var(--font-primary);
@@ -53,7 +53,7 @@
 }
 
 .topbar-search-input:focus {
-  border-color: var(--accent-green);
+  border-color: #000000;
   box-shadow: 0 0 0 3px rgba(0, 224, 90, 0.1);
 }
 

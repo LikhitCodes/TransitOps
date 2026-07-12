@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════ */
 
 .expenses-page {
-  min-height: 100vh;
+  /* min-height handled by AppLayout */
   background: var(--bg-base);
 }
 
@@ -12,14 +12,14 @@
 .expense-kpi-strip {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: var(--space-4);
-  margin-bottom: var(--space-8);
+  gap: 16px;
+  margin-bottom: 24px;
 }
 .expense-kpi-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5) var(--space-6);
+  background: #FFFFFF;
+  border: 2px solid var(--border-default);
+  border-radius: 0;
+  padding: 16px 20px;
   position: relative;
   overflow: hidden;
   transition: all 0.3s var(--ease-default);
@@ -34,8 +34,8 @@
 }
 .expense-kpi-card:hover {
   border-color: var(--border-default);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card-hover);
+  /* no lift */
+  /* no shadow */
 }
 .expense-kpi-card--fuel::before       { background: var(--accent-blue); }
 .expense-kpi-card--maintenance::before { background: var(--accent-amber); }
@@ -65,12 +65,12 @@
 .expense-tabs {
   display: flex;
   gap: 2px;
-  margin-bottom: var(--space-6);
+  margin-bottom: 20px;
   background: var(--bg-subtle);
-  border-radius: var(--radius-pill);
+  border-radius: 0;
   padding: 3px;
   width: fit-content;
-  border: 1px solid var(--border-subtle);
+  border: 2px solid var(--border-default);
 }
 .expense-tab {
   background: transparent;
@@ -81,7 +81,7 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  border-radius: var(--radius-pill);
+  border-radius: 0;
   transition: all 0.2s ease;
   letter-spacing: 0.02em;
 }
@@ -89,9 +89,9 @@
   color: var(--text-secondary);
 }
 .expense-tab.active {
-  background: var(--bg-elevated);
+  background: #FFFFFF;
   color: var(--accent-green);
-  box-shadow: var(--shadow-sm);
+  /* no shadow */
 }
 
 /* ── Filter Row ── */
@@ -99,19 +99,19 @@
 .expense-filter-row {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-5);
+  gap: 12px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
 }
 
 /* ── Table Container ── */
 
 .expense-table-container {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  background: #FFFFFF;
+  border: 2px solid var(--border-default);
+  border-radius: 0;
   overflow: hidden;
-  margin-bottom: var(--space-6);
+  margin-bottom: 20px;
 }
 
 /* ── Expense Type Badge ── */
@@ -121,7 +121,7 @@
   align-items: center;
   gap: 6px;
   padding: 3px 10px;
-  border-radius: var(--radius-pill);
+  border-radius: 0;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -153,21 +153,21 @@
 .expense-summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--space-4);
+  gap: 16px;
 }
 
 .expense-summary-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5) var(--space-6);
+  background: #FFFFFF;
+  border: 2px solid var(--border-default);
+  border-radius: 0;
+  padding: 16px 20px;
   transition: all 0.3s var(--ease-default);
   animation: staggerFadeIn 0.3s var(--ease-default) backwards;
 }
 .expense-summary-card:hover {
   border-color: var(--border-default);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card-hover);
+  /* no lift */
+  /* no shadow */
 }
 
 .expense-summary-card-header {
@@ -202,7 +202,7 @@
   padding: var(--space-2) 0;
 }
 .expense-breakdown-item:not(:last-child) {
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 2px solid var(--border-default);
 }
 .expense-breakdown-label {
   display: flex;
@@ -229,7 +229,7 @@
 .expense-bar-stack {
   display: flex;
   height: 6px;
-  border-radius: var(--radius-pill);
+  border-radius: 0;
   overflow: hidden;
   margin-top: var(--space-3);
   background: var(--bg-subtle);

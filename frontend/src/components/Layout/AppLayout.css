@@ -10,7 +10,7 @@
 .app-content {
   margin-left: var(--sidebar-width);
   margin-top: var(--topbar-height);
-  padding: var(--space-6);
+  padding: 16px;
   min-height: calc(100vh - var(--topbar-height));
   animation: fadeIn 0.3s var(--ease-default);
 }
