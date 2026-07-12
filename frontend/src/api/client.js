@@ -15,11 +15,11 @@ export class APIError extends Error {
  * Gets the current auth token from local storage
  */
 const getToken = () => {
-  const tokenStr = localStorage.getItem('transitops_token');
-  if (!tokenStr) return null;
+  const userStr = localStorage.getItem('transitops_user');
+  if (!userStr) return null;
   try {
-    const tokens = JSON.parse(tokenStr);
-    return tokens.access;
+    const user = JSON.parse(userStr);
+    return user.token;
   } catch {
     return null;
   }
