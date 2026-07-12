@@ -104,6 +104,20 @@ export default function VehiclesPage() {
 
   return (
     <div className="vehicles-page">
+      {/* ── Page Header ── */}
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Fleet Registry</h1>
+          <p className="page-subtitle">Manage vehicle inventory and track fleet status</p>
+        </div>
+        <button
+          className="btn-primary"
+          onClick={() => setIsModalOpen(true)}
+        >
+          + Add Vehicle
+        </button>
+      </div>
+
       {/* ── Action Bar ── */}
       <div className="vehicles-action-bar">
         <div className="vehicles-filters">
@@ -141,13 +155,6 @@ export default function VehiclesPage() {
             />
           </div>
         </div>
-
-        <button
-          className="vehicles-add-btn"
-          onClick={() => setIsModalOpen(true)}
-        >
-          + Add Vehicle
-        </button>
       </div>
 
       {/* ── Data Table ── */}

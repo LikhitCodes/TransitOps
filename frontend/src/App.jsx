@@ -8,6 +8,7 @@ import TripsPage from './pages/TripsPage'
 import MaintenancePage from './pages/MaintenancePage'
 import ExpensesPage from './pages/ExpensesPage'
 import ReportsPage from './pages/ReportsPage'
+import SettingsPage from './pages/SettingsPage'
 import AppLayout from './components/Layout/AppLayout'
 
 function App() {
@@ -30,8 +31,8 @@ function App() {
         <Route path="/fuel-expenses" element={<ExpensesPage />} />
         <Route path="/analytics" element={<ReportsPage />} />
         
-        {/* Placeholder routes */}
-        <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
+        {/* Settings route */}
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
 
       {/* Catch-all */}

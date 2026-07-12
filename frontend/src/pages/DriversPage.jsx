@@ -126,6 +126,20 @@ export default function DriversPage() {
 
   return (
     <div className="drivers-page">
+      {/* ── Page Header ── */}
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Drivers Directory</h1>
+          <p className="page-subtitle">Manage driver profiles and track safety metrics</p>
+        </div>
+        <button
+          className="btn-primary"
+          onClick={() => setIsModalOpen(true)}
+        >
+          + Add Driver
+        </button>
+      </div>
+
       {/* ── Action Bar ── */}
       <div className="drivers-action-bar">
         <div className="drivers-filters">
@@ -144,13 +158,6 @@ export default function DriversPage() {
             />
           </div>
         </div>
-
-        <button
-          className="drivers-add-btn"
-          onClick={() => setIsModalOpen(true)}
-        >
-          + Add Driver
-        </button>
       </div>
 
       {/* ── Data Table ── */}

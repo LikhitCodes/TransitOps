@@ -1,0 +1,150 @@
+/* ═══════════════════════════════════════════════════
+   SettingsPage — Settings & RBAC
+   ═══════════════════════════════════════════════════ */
+
+.settings-page {
+  animation: fadeIn 0.4s var(--ease-default);
+}
+
+.settings-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* ── Sections ── */
+.settings-section {
+  background: #FFFFFF;
+  border: 2px solid var(--border-default);
+  padding: 32px;
+}
+
+.settings-section-title {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #000000;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #000000;
+}
+
+/* ── General Settings Form ── */
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.settings-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-label {
+  font-family: var(--font-heading);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.settings-input,
+.settings-select {
+  background: var(--bg-subtle);
+  border: 2px solid var(--border-default);
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.settings-select {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23000000' stroke-width='2' stroke-linecap='square'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 12px;
+}
+
+.settings-input:focus,
+.settings-select:focus {
+  border-color: #000000;
+  border-width: 3px;
+  padding: 11px 15px; /* Adjust padding to prevent layout shift due to thicker border */
+}
+
+.settings-actions {
+  margin-top: 12px;
+}
+
+/* ── RBAC Table ── */
+.rbac-table-container {
+  overflow-x: auto;
+}
+
+.rbac-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.rbac-table th {
+  font-family: var(--font-heading);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: left;
+  padding: 16px 12px;
+  border-bottom: 2px solid var(--border-default);
+}
+
+.rbac-table td {
+  padding: 16px 12px;
+  font-family: var(--font-primary);
+  font-size: 14px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.rbac-table tr:last-child td {
+  border-bottom: none;
+}
+
+.rbac-role-name {
+  font-weight: 600;
+}
+
+.rbac-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.rbac-value.check {
+  color: var(--accent-green);
+  font-weight: 700;
+}
+
+.rbac-value.dash {
+  color: var(--text-muted);
+}
+
+.rbac-value.view {
+  color: var(--accent-blue);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .settings-content {
+    grid-template-columns: 1fr;
+  }
+}
