@@ -1,37 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import './ReportsPage.css';
 
-// ─── Mock Analytics Data ─────────────────────────────────────
-
-const VEHICLES = [
-  { id: 1, reg: 'VAN-05', model: 'Ford Transit', acquisition_cost: 1200000 },
-  { id: 2, reg: 'TRK-12', model: 'Volvo FH16', acquisition_cost: 4500000 },
-  { id: 3, reg: 'PKP-03', model: 'Toyota Hilux', acquisition_cost: 1800000 },
-  { id: 4, reg: 'VAN-08', model: 'Mercedes Sprinter', acquisition_cost: 1500000 },
-  { id: 5, reg: 'SEM-01', model: 'Scania R450', acquisition_cost: 6200000 },
-  { id: 6, reg: 'TRK-07', model: 'MAN TGX', acquisition_cost: 3800000 },
-];
-
-// Per-vehicle aggregated data
-const VEHICLE_STATS = [
-  { vehicle_id: 1, total_distance: 760, total_fuel: 95, total_fuel_cost: 9975, total_maint_cost: 4000, total_toll_cost: 350, total_other_cost: 800, total_revenue: 69000, total_trips: 4 },
-  { vehicle_id: 2, total_distance: 1190, total_fuel: 250, total_fuel_cost: 26250, total_maint_cost: 8500, total_toll_cost: 1300, total_other_cost: 0, total_revenue: 126000, total_trips: 5 },
-  { vehicle_id: 3, total_distance: 615, total_fuel: 80, total_fuel_cost: 8400, total_maint_cost: 4500, total_toll_cost: 290, total_other_cost: 0, total_revenue: 46000, total_trips: 3 },
-  { vehicle_id: 4, total_distance: 420, total_fuel: 55, total_fuel_cost: 5775, total_maint_cost: 15000, total_toll_cost: 0, total_other_cost: 1200, total_revenue: 32000, total_trips: 2 },
-  { vehicle_id: 5, total_distance: 890, total_fuel: 150, total_fuel_cost: 15750, total_maint_cost: 12000, total_toll_cost: 0, total_other_cost: 0, total_revenue: 85000, total_trips: 3 },
-  { vehicle_id: 6, total_distance: 540, total_fuel: 80, total_fuel_cost: 8400, total_maint_cost: 6000, total_toll_cost: 0, total_other_cost: 0, total_revenue: 48000, total_trips: 2 },
-];
-
-// Fleet utilization over time (last 7 days)
-const UTILIZATION_DATA = [
-  { date: 'Jul 06', active: 3, total: 6, pct: 50 },
-  { date: 'Jul 07', active: 4, total: 6, pct: 67 },
-  { date: 'Jul 08', active: 3, total: 6, pct: 50 },
-  { date: 'Jul 09', active: 5, total: 6, pct: 83 },
-  { date: 'Jul 10', active: 4, total: 6, pct: 67 },
-  { date: 'Jul 11', active: 3, total: 6, pct: 50 },
-  { date: 'Jul 12', active: 2, total: 6, pct: 33 },
-];
+// ─── Helper Functions ────────────────────────────────────────
 
 const formatCurrency = (val) => `₹${val.toLocaleString()}`;
 
@@ -52,14 +22,14 @@ function downloadCSV(headers, rows, filename) {
 
 // ─── Report Components ───────────────────────────────────────
 
-function FuelEfficiencyReport() {
+function FuelEfficiencyReport({ vehicleStats, vehicles }) {
   const data = useMemo(() =>
-    VEHICLE_STATS.map(s => {
-      const v = VEHICLES.find(v => v.id === s.vehicle_id);
+    vehicleStats.map(s => {
+      const v = vehicles.find(v => v.id === s.vehicle);
       const efficiency = s.total_fuel > 0 ? (s.total_distance / s.total_fuel) : 0;
       return { ...s, vehicle: v, efficiency: Math.round(efficiency * 10) / 10 };
     }).sort((a, b) => b.efficiency - a.efficiency),
-  []);
+    [vehicleStats, vehicles]);
 
   const maxEfficiency = Math.max(...data.map(d => d.efficiency));
   const avgEfficiency = (data.reduce((s, d) => s + d.efficiency, 0) / data.length).toFixed(1);
@@ -67,7 +37,7 @@ function FuelEfficiencyReport() {
   const handleExport = () => {
     downloadCSV(
       ['Vehicle', 'Model', 'Distance (km)', 'Fuel (L)', 'Efficiency (km/L)'],
-      data.map(d => [d.vehicle.reg, d.vehicle.model, d.total_distance, d.total_fuel, d.efficiency]),
+      data.map(d => [d.vehicle?.registration_number, d.vehicle?.model_name, d.total_distance, d.total_fuel, d.efficiency]),
       'fuel_efficiency_report.csv'
     );
   };
@@ -102,8 +72,8 @@ function FuelEfficiencyReport() {
         </div>
         <div className="h-bar-chart">
           {data.map((d, i) => (
-            <div className="h-bar-item" key={d.vehicle_id} style={{ animationDelay: `${i * 80}ms` }}>
-              <span className="h-bar-label">{d.vehicle.reg}</span>
+            <div className="h-bar-item" key={d.vehicle} style={{ animationDelay: `${i * 80}ms` }}>
+              <span className="h-bar-label">{d.vehicle?.registration_number}</span>
               <div className="h-bar-track">
                 <div
                   className="h-bar-fill"
@@ -134,10 +104,10 @@ function FuelEfficiencyReport() {
           </thead>
           <tbody>
             {data.map((d, i) => (
-              <tr key={d.vehicle_id}>
+              <tr key={d.vehicle}>
                 <td className="cell-mono" style={{ color: i === 0 ? 'var(--accent-green)' : 'var(--text-muted)' }}>#{i + 1}</td>
-                <td className="cell-mono">{d.vehicle.reg}</td>
-                <td>{d.vehicle.model}</td>
+                <td className="cell-mono">{d.vehicle?.registration_number}</td>
+                <td>{d.vehicle?.model_name}</td>
                 <td className="cell-mono">{d.total_distance}</td>
                 <td className="cell-mono">{d.total_fuel} L</td>
                 <td className="cell-mono" style={{ fontWeight: 700, color: d.efficiency >= avgEfficiency ? 'var(--accent-green)' : 'var(--accent-orange)' }}>
@@ -152,15 +122,15 @@ function FuelEfficiencyReport() {
   );
 }
 
-function FleetUtilizationReport() {
+function FleetUtilizationReport({ utilizationData, vehicles }) {
   const maxPct = 100;
-  const avgUtil = (UTILIZATION_DATA.reduce((s, d) => s + d.pct, 0) / UTILIZATION_DATA.length).toFixed(0);
-  const peakDay = UTILIZATION_DATA.reduce((best, d) => d.pct > best.pct ? d : best, UTILIZATION_DATA[0]);
+  const avgUtil = utilizationData.length > 0 ? (utilizationData.reduce((s, d) => s + d.pct, 0) / utilizationData.length).toFixed(0) : 0;
+  const peakDay = utilizationData.length > 0 ? utilizationData.reduce((best, d) => d.pct > best.pct ? d : best, utilizationData[0]) : { pct: 0, date: '-' };
 
   const handleExport = () => {
     downloadCSV(
       ['Date', 'Active Vehicles', 'Total Vehicles', 'Utilization (%)'],
-      UTILIZATION_DATA.map(d => [d.date, d.active, d.total, `${d.pct}%`]),
+      utilizationData.map(d => [d.date, d.active, d.total, `${d.pct}%`]),
       'fleet_utilization_report.csv'
     );
   };
@@ -182,7 +152,7 @@ function FleetUtilizationReport() {
           <div className="report-stat-label">Peak ({peakDay.date})</div>
         </div>
         <div className="report-stat-card report-stat-card--amber">
-          <div className="report-stat-value">{VEHICLES.length}</div>
+          <div className="report-stat-value">{vehicles.length}</div>
           <div className="report-stat-label">Total Fleet Size</div>
         </div>
       </div>
@@ -194,7 +164,7 @@ function FleetUtilizationReport() {
           <button className="btn-secondary btn-sm" onClick={handleExport}>Export CSV</button>
         </div>
         <div className="bar-chart">
-          {UTILIZATION_DATA.map((d, i) => (
+          {utilizationData.map((d, i) => (
             <div className="bar-chart-item" key={i}>
               <div
                 className="bar-chart-bar"
@@ -215,7 +185,7 @@ function FleetUtilizationReport() {
         <table className="data-table">
           <thead><tr><th>Date</th><th>Active</th><th>Total</th><th>Utilization</th></tr></thead>
           <tbody>
-            {UTILIZATION_DATA.map((d, i) => (
+            {utilizationData.map((d, i) => (
               <tr key={i}>
                 <td>{d.date}</td>
                 <td className="cell-mono">{d.active}</td>
@@ -232,14 +202,14 @@ function FleetUtilizationReport() {
   );
 }
 
-function OperationalCostReport() {
+function OperationalCostReport({ vehicleStats, vehicles }) {
   const costData = useMemo(() =>
-    VEHICLE_STATS.map(s => {
-      const v = VEHICLES.find(v => v.id === s.vehicle_id);
+    vehicleStats.map(s => {
+      const v = vehicles.find(v => v.id === s.vehicle);
       const totalOps = s.total_fuel_cost + s.total_maint_cost + s.total_toll_cost + s.total_other_cost;
       return { ...s, vehicle: v, totalOps };
     }).sort((a, b) => b.totalOps - a.totalOps),
-  []);
+    [vehicleStats, vehicles]);
 
   const grandTotal = costData.reduce((s, d) => s + d.totalOps, 0);
   const totalFuel = costData.reduce((s, d) => s + d.total_fuel_cost, 0);
@@ -268,7 +238,7 @@ function OperationalCostReport() {
   const handleExport = () => {
     downloadCSV(
       ['Vehicle', 'Model', 'Fuel Cost', 'Maintenance', 'Tolls', 'Other', 'Total Ops Cost'],
-      costData.map(d => [d.vehicle.reg, d.vehicle.model, d.total_fuel_cost, d.total_maint_cost, d.total_toll_cost, d.total_other_cost, d.totalOps]),
+      costData.map(d => [d.vehicle?.registration_number, d.vehicle?.model_name, d.total_fuel_cost, d.total_maint_cost, d.total_toll_cost, d.total_other_cost, d.totalOps]),
       'operational_cost_report.csv'
     );
   };
@@ -338,8 +308,8 @@ function OperationalCostReport() {
         </div>
         <div className="h-bar-chart">
           {costData.map((d, i) => (
-            <div className="h-bar-item" key={d.vehicle_id} style={{ animationDelay: `${i * 80}ms` }}>
-              <span className="h-bar-label">{d.vehicle.reg}</span>
+            <div className="h-bar-item" key={d.vehicle} style={{ animationDelay: `${i * 80}ms` }}>
+              <span className="h-bar-label">{d.vehicle?.registration_number}</span>
               <div className="h-bar-track">
                 <div className="h-bar-fill" style={{ width: `${(d.totalOps / maxCost) * 100}%`, background: 'var(--accent-amber)' }} />
               </div>
@@ -354,9 +324,9 @@ function OperationalCostReport() {
           <thead><tr><th>Vehicle</th><th>Model</th><th>Fuel (₹)</th><th>Maintenance (₹)</th><th>Tolls (₹)</th><th>Other (₹)</th><th>Total (₹)</th></tr></thead>
           <tbody>
             {costData.map(d => (
-              <tr key={d.vehicle_id}>
-                <td className="cell-mono">{d.vehicle.reg}</td>
-                <td>{d.vehicle.model}</td>
+              <tr key={d.vehicle}>
+                <td className="cell-mono">{d.vehicle?.registration_number}</td>
+                <td>{d.vehicle?.model_name}</td>
                 <td className="cell-mono">{formatCurrency(d.total_fuel_cost)}</td>
                 <td className="cell-mono">{formatCurrency(d.total_maint_cost)}</td>
                 <td className="cell-mono">{formatCurrency(d.total_toll_cost)}</td>
@@ -371,27 +341,41 @@ function OperationalCostReport() {
   );
 }
 
-function VehicleROIReport() {
+function VehicleROIReport({ vehicleStats, vehicles }) {
   const roiData = useMemo(() =>
-    VEHICLE_STATS.map(s => {
-      const v = VEHICLES.find(v => v.id === s.vehicle_id);
+    vehicleStats.map(s => {
+      const v = vehicles.find(v => v.id === s.vehicle);
       const totalCosts = s.total_fuel_cost + s.total_maint_cost + s.total_toll_cost + s.total_other_cost;
-      const roi = v.acquisition_cost > 0
-        ? ((s.total_revenue - totalCosts) / v.acquisition_cost * 100)
+      const acqCost = v?.acquisition_cost || 0;
+      const roi = acqCost > 0
+        ? ((s.total_revenue - totalCosts) / acqCost * 100)
         : 0;
       return { ...s, vehicle: v, totalCosts, roi: Math.round(roi * 100) / 100 };
     }).sort((a, b) => b.roi - a.roi),
-  []);
+    [vehicleStats, vehicles]);
 
-  const avgROI = (roiData.reduce((s, d) => s + d.roi, 0) / roiData.length).toFixed(2);
-  const maxROI = Math.max(...roiData.map(d => Math.abs(d.roi)));
+  const avgROI = roiData.length > 0 ? (roiData.reduce((s, d) => s + d.roi, 0) / roiData.length).toFixed(2) : 0;
+  const maxROI = roiData.length > 0 ? Math.max(...roiData.map(d => Math.abs(d.roi))) : 1;
 
-  const handleExport = () => {
-    downloadCSV(
-      ['Vehicle', 'Model', 'Revenue', 'Total Costs', 'Acquisition Cost', 'ROI (%)'],
-      roiData.map(d => [d.vehicle.reg, d.vehicle.model, d.total_revenue, d.totalCosts, d.vehicle.acquisition_cost, `${d.roi}%`]),
-      'vehicle_roi_report.csv'
-    );
+  const handleExport = async () => {
+    try {
+      const token = JSON.parse(localStorage.getItem('transitops_user'))?.token;
+      const res = await fetch('http://127.0.0.1:8000/api/analytics/export/csv/', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Export failed');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'transitops_analytics.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to export CSV');
+    }
   };
 
   return (
@@ -424,8 +408,8 @@ function VehicleROIReport() {
         </div>
         <div className="h-bar-chart">
           {roiData.map((d, i) => (
-            <div className="h-bar-item" key={d.vehicle_id} style={{ animationDelay: `${i * 80}ms` }}>
-              <span className="h-bar-label">{d.vehicle.reg}</span>
+            <div className="h-bar-item" key={d.vehicle} style={{ animationDelay: `${i * 80}ms` }}>
+              <span className="h-bar-label">{d.vehicle?.registration_number}</span>
               <div className="h-bar-track">
                 <div
                   className="h-bar-fill"
@@ -450,15 +434,15 @@ function VehicleROIReport() {
             {roiData.map((d, i) => {
               const profit = d.total_revenue - d.totalCosts;
               return (
-                <tr key={d.vehicle_id}>
+                <tr key={d.vehicle}>
                   <td className="cell-mono" style={{ color: i === 0 ? 'var(--accent-green)' : 'var(--text-muted)' }}>#{i + 1}</td>
-                  <td className="cell-mono">{d.vehicle.reg}</td>
+                  <td className="cell-mono">{d.vehicle?.registration_number}</td>
                   <td className="cell-mono">{formatCurrency(d.total_revenue)}</td>
                   <td className="cell-mono">{formatCurrency(d.totalCosts)}</td>
                   <td className="cell-mono" style={{ color: profit >= 0 ? 'var(--accent-green)' : 'var(--accent-red)', fontWeight: 600 }}>
                     {profit >= 0 ? '+' : ''}{formatCurrency(profit)}
                   </td>
-                  <td className="cell-mono">{formatCurrency(d.vehicle.acquisition_cost)}</td>
+                  <td className="cell-mono">{formatCurrency(d.vehicle?.acquisition_cost || 0)}</td>
                   <td className="cell-mono" style={{ fontWeight: 700, color: d.roi >= 0 ? 'var(--accent-green)' : 'var(--accent-red)' }}>
                     {d.roi >= 0 ? '+' : ''}{d.roi}%
                   </td>
@@ -478,6 +462,104 @@ function VehicleROIReport() {
 
 export default function ReportsPage() {
   const [activeReport, setActiveReport] = useState('fuel-efficiency');
+  const [vehicles, setVehicles] = useState([]);
+  const [trips, setTrips] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+  const [fuelLogs, setFuelLogs] = useState([]);
+  const [dashboardData, setDashboardData] = useState(null);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const token = JSON.parse(localStorage.getItem('transitops_user'))?.token;
+      const headers = { 'Authorization': `Bearer ${token}` };
+
+      const [vehRes, tripRes, expRes, fuelRes, dashboardRes] = await Promise.all([
+        fetch('http://127.0.0.1:8000/api/fleet/vehicles/', { headers }),
+        fetch('http://127.0.0.1:8000/api/trips/', { headers }),
+        fetch('http://127.0.0.1:8000/api/expenses/', { headers }),
+        fetch('http://127.0.0.1:8000/api/fuel-logs/', { headers }),
+        fetch('http://127.0.0.1:8000/api/analytics/dashboard/', { headers }),
+      ]);
+
+      if (vehRes.ok) {
+        const data = await vehRes.json();
+        setVehicles(Array.isArray(data) ? data : data.results || []);
+      }
+      if (tripRes.ok) {
+        const data = await tripRes.json();
+        setTrips(Array.isArray(data) ? data : data.results || []);
+      }
+      if (expRes.ok) {
+        const data = await expRes.json();
+        setExpenses(Array.isArray(data) ? data : data.results || []);
+      }
+      if (fuelRes.ok) {
+        const data = await fuelRes.json();
+        setFuelLogs(Array.isArray(data) ? data : data.results || []);
+      }
+      if (dashboardRes.ok) {
+        setDashboardData(await dashboardRes.json());
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const vehicleStats = useMemo(() => {
+    const map = {};
+    vehicles.forEach(v => {
+      map[v.id] = {
+        vehicle: v.id, total_distance: 0, total_fuel: 0, total_fuel_cost: 0,
+        total_maint_cost: 0, total_toll_cost: 0, total_other_cost: 0,
+        total_revenue: 0, total_trips: 0
+      };
+    });
+
+    trips.forEach(t => {
+      if (map[t.vehicle] && t.status === 'Completed') {
+        map[t.vehicle].total_trips += 1;
+        map[t.vehicle].total_distance += (t.actual_distance || t.planned_distance || 0);
+        map[t.vehicle].total_fuel += (t.fuel_consumed || 0);
+        map[t.vehicle].total_revenue += (t.revenue || 0);
+      }
+    });
+
+    fuelLogs.forEach(f => {
+      if (map[f.vehicle]) {
+        map[f.vehicle].total_fuel_cost += (f.cost || 0);
+      }
+    });
+
+    expenses.forEach(e => {
+      if (map[e.vehicle]) {
+        if (e.expense_type === 'Maintenance Cost') map[e.vehicle].total_maint_cost += e.cost;
+        else if (e.expense_type === 'Toll') map[e.vehicle].total_toll_cost += e.cost;
+        else map[e.vehicle].total_other_cost += e.cost;
+      }
+    });
+
+    return Object.values(map);
+  }, [vehicles, trips, expenses, fuelLogs]);
+
+  const utilizationData = useMemo(() => {
+    // Generate basic last 7 days mock data, but dynamically scale to total vehicles.
+    const total = vehicles.length;
+    return Array.from({ length: 7 }).map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      const active = Math.floor(Math.random() * (total + 1));
+      return {
+        date: d.toLocaleDateString('en-IN', { month: 'short', day: '2-digit' }),
+        active,
+        total,
+        pct: total > 0 ? Math.round((active / total) * 100) : 0
+      };
+    });
+  }, [vehicles.length]);
 
   const REPORTS = [
     { key: 'fuel-efficiency', label: 'Fuel Efficiency' },
@@ -488,11 +570,11 @@ export default function ReportsPage() {
 
   const renderReport = () => {
     switch (activeReport) {
-      case 'fuel-efficiency':    return <FuelEfficiencyReport />;
-      case 'fleet-utilization':  return <FleetUtilizationReport />;
-      case 'operational-cost':   return <OperationalCostReport />;
-      case 'vehicle-roi':        return <VehicleROIReport />;
-      default:                   return <FuelEfficiencyReport />;
+      case 'fuel-efficiency': return <FuelEfficiencyReport vehicleStats={vehicleStats} vehicles={vehicles} />;
+      case 'fleet-utilization': return <FleetUtilizationReport utilizationData={utilizationData} vehicles={vehicles} />;
+      case 'operational-cost': return <OperationalCostReport vehicleStats={vehicleStats} vehicles={vehicles} />;
+      case 'vehicle-roi': return <VehicleROIReport vehicleStats={vehicleStats} vehicles={vehicles} />;
+      default: return <FuelEfficiencyReport vehicleStats={vehicleStats} vehicles={vehicles} />;
     }
   };
 
@@ -506,6 +588,28 @@ export default function ReportsPage() {
             <p className="page-subtitle">Operational insights, fleet performance, and financial metrics</p>
           </div>
         </div>
+
+        {/* Global KPIs from Dashboard API */}
+        {dashboardData && (
+          <div className="report-headline" style={{ marginBottom: '24px' }}>
+            <div className="report-stat-card report-stat-card--green">
+              <div className="report-stat-value">{dashboardData.fuel_efficiency}</div>
+              <div className="report-stat-label">Avg Fuel Efficiency</div>
+            </div>
+            <div className="report-stat-card report-stat-card--blue">
+              <div className="report-stat-value">{dashboardData.fleet_utilization}</div>
+              <div className="report-stat-label">Fleet Utilization</div>
+            </div>
+            <div className="report-stat-card report-stat-card--orange">
+              <div className="report-stat-value">₹{dashboardData.operational_cost?.toLocaleString()}</div>
+              <div className="report-stat-label">Operational Cost</div>
+            </div>
+            <div className="report-stat-card report-stat-card--purple">
+              <div className="report-stat-value">{dashboardData.vehicle_roi}</div>
+              <div className="report-stat-label">Global ROI</div>
+            </div>
+          </div>
+        )}
 
         {/* Report Tabs */}
         <div className="report-tabs">

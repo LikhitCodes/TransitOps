@@ -5,6 +5,7 @@ Django settings for TransitOps project.
 from pathlib import Path
 from datetime import timedelta
 from decouple import config, Csv
+import os
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -74,27 +75,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # ---------------------------------------------------------------------------
 # Database — configured via .env (SQLite for dev, PostgreSQL for production)
 # ---------------------------------------------------------------------------
-_DB_ENGINE = config('DB_ENGINE', default='django.db.backends.postgresql')
-_DB_NAME   = config('DB_NAME',   default='transitops')
-
-if _DB_ENGINE == 'django.db.backends.sqlite3':
-    DATABASES = {
-        'default': {
-            'ENGINE': _DB_ENGINE,
-            'NAME':   BASE_DIR / _DB_NAME,   # absolute path required by SQLite
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),  
+        'NAME': os.getenv('DB_NAME', 'TransitOps'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', '1234'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE':   _DB_ENGINE,
-            'NAME':     _DB_NAME,
-            'USER':     config('DB_USER',     default='postgres'),
-            'PASSWORD': config('DB_PASSWORD', default=''),
-            'HOST':     config('DB_HOST',     default='localhost'),
-            'PORT':     config('DB_PORT',     default='5432'),
-        }
-    }
+}
 
 # ---------------------------------------------------------------------------
 # Custom user model

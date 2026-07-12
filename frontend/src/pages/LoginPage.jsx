@@ -1,19 +1,26 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, MOCK_USERS, ROLE_DEFAULT_ROUTE } from '../context/AuthContext';
+import { useAuth, ROLE_DEFAULT_ROUTE } from '../context/AuthContext';
 import TransitOpsLogo from '../components/TransitOpsLogo';
 import './LoginPage.css';
 
 const ROLES = [
   'Fleet Manager',
-  'Dispatcher',
+  'Driver',
   'Safety Officer',
   'Financial Analyst',
 ];
 
+const DEMO_USERS = {
+  'Fleet Manager':     { email: 'fleet@transitops.com', password: 'transit123' },
+  'Driver':            { email: 'driver@transitops.com', password: 'transit123' },
+  'Safety Officer':    { email: 'safety@transitops.com', password: 'transit123' },
+  'Financial Analyst': { email: 'finance@transitops.com', password: 'transit123' },
+};
+
 const ACCESS_SCOPES = [
   { role: 'Fleet Manager',     modules: 'Fleet, Maintenance' },
-  { role: 'Dispatcher',        modules: 'Dashboard, Trips' },
+  { role: 'Driver',            modules: 'Dashboard, Trips' },
   { role: 'Safety Officer',    modules: 'Drivers, Compliance' },
   { role: 'Financial Analyst', modules: 'Fuel & Expenses, Analytics' },
 ];
@@ -24,7 +31,7 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('Dispatcher');
+  const [role, setRole] = useState('Driver');
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -44,7 +51,7 @@ export default function LoginPage() {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 600));
 
-    const result = login(email, password, role);
+    const result = await login(email, password, role);
 
     if (result.success) {
       const target = ROLE_DEFAULT_ROUTE[role] || '/dashboard';
@@ -72,7 +79,7 @@ export default function LoginPage() {
             <h2 className="login-roles-title">Demo Credentials:</h2>
             <div className="login-roles-cards">
               {ROLES.map((r) => {
-                const mockUser = MOCK_USERS[r];
+                const mockUser = DEMO_USERS[r];
                 return (
                   <button 
                     key={r} 

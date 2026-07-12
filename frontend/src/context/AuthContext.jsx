@@ -8,7 +8,7 @@ const AuthContext = createContext(null);
  */
 export const ROLE_ROUTES = {
   'Fleet Manager':      ['/fleet', '/maintenance'],
-  'Dispatcher':         ['/dashboard', '/trips'],
+  'Driver':             ['/dashboard', '/trips'],
   'Safety Officer':     ['/drivers', '/compliance'],
   'Financial Analyst':  ['/fuel-expenses', '/analytics'],
 };
@@ -18,7 +18,7 @@ export const ROLE_ROUTES = {
  */
 export const ROLE_DEFAULT_ROUTE = {
   'Fleet Manager':      '/fleet',
-  'Dispatcher':         '/dashboard',
+  'Driver':             '/dashboard',
   'Safety Officer':     '/drivers',
   'Financial Analyst':  '/fuel-expenses',
 };
@@ -26,13 +26,7 @@ export const ROLE_DEFAULT_ROUTE = {
 const LOCKOUT_DURATION_MS = 10 * 60 * 1000; // 10 minutes
 const MAX_FAILED_ATTEMPTS = 5;
 
-// Mock credentials for frontend-only testing (one for each role)
-export const MOCK_USERS = {
-  'Fleet Manager':     { email: 'fleet@transitops.in', password: 'password123' },
-  'Dispatcher':        { email: 'dispatcher@transitops.in', password: 'password123' },
-  'Safety Officer':    { email: 'safety@transitops.in', password: 'password123' },
-  'Financial Analyst': { email: 'finance@transitops.in', password: 'password123' },
-};
+// Removed mock users
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -74,11 +68,9 @@ export function AuthProvider({ children }) {
   const isLockedOut = lockoutUntil !== null && Date.now() < lockoutUntil;
 
   /**
-   * Mock login — validates against hardcoded credentials.
-   * Returns { success, error } for the UI to handle.
-   * When backend is ready, replace the validation block with an API call.
+   * Login using Django REST Framework SimpleJWT endpoint
    */
-  const login = useCallback((email, password, role) => {
+  const login = useCallback(async (email, password, expectedRole) => {
     // Check lockout
     if (isLockedOut) {
       const mins = Math.ceil(lockoutRemaining / 60000);
@@ -88,39 +80,62 @@ export function AuthProvider({ children }) {
       };
     }
 
-    // Simulate authentication
-    const mockUser = MOCK_USERS[role];
-    const isValid = mockUser &&
-      email.toLowerCase() === mockUser.email &&
-      password === mockUser.password;
+    try {
+      // 1. Get Token
+      const res = await fetch('http://127.0.0.1:8000/api/auth/login/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!isValid) {
-      const newAttempts = failedAttempts + 1;
-      setFailedAttempts(newAttempts);
+      if (!res.ok) {
+        const newAttempts = failedAttempts + 1;
+        setFailedAttempts(newAttempts);
 
-      if (newAttempts >= MAX_FAILED_ATTEMPTS) {
-        const until = Date.now() + LOCKOUT_DURATION_MS;
-        setLockoutUntil(until);
+        if (newAttempts >= MAX_FAILED_ATTEMPTS) {
+          const until = Date.now() + LOCKOUT_DURATION_MS;
+          setLockoutUntil(until);
+          return {
+            success: false,
+            error: `Account locked after ${MAX_FAILED_ATTEMPTS} failed attempts. Try again in 10 minutes.`,
+          };
+        }
+
         return {
           success: false,
-          error: `Account locked after ${MAX_FAILED_ATTEMPTS} failed attempts. Try again in 10 minutes.`,
+          error: `Invalid credentials. ${MAX_FAILED_ATTEMPTS - newAttempts} attempt${MAX_FAILED_ATTEMPTS - newAttempts !== 1 ? 's' : ''} remaining.`,
         };
       }
 
-      return {
-        success: false,
-        error: `Invalid credentials. ${MAX_FAILED_ATTEMPTS - newAttempts} attempt${MAX_FAILED_ATTEMPTS - newAttempts !== 1 ? 's' : ''} remaining.`,
-      };
+      const data = await res.json();
+      const token = data.access;
+
+      // 2. Get User Profile to verify role
+      const profileRes = await fetch('http://127.0.0.1:8000/api/auth/me/', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!profileRes.ok) throw new Error('Failed to fetch profile');
+      const profileData = await profileRes.json();
+
+      // Role check against the role they selected on login screen
+      if (profileData.role !== expectedRole && expectedRole) {
+        return {
+          success: false,
+          error: `You do not have the ${expectedRole} role.`
+        }
+      }
+
+      const userData = { ...profileData, token };
+      setUser(userData);
+      setFailedAttempts(0);
+      setLockoutUntil(null);
+      localStorage.setItem('transitops_user', JSON.stringify(userData));
+
+      return { success: true, error: null };
+    } catch (err) {
+      return { success: false, error: 'Network error connecting to the server.' };
     }
-
-    // Success
-    const userData = { email, role };
-    setUser(userData);
-    setFailedAttempts(0);
-    setLockoutUntil(null);
-    localStorage.setItem('transitops_user', JSON.stringify(userData));
-
-    return { success: true, error: null };
   }, [failedAttempts, isLockedOut, lockoutRemaining]);
 
   const logout = useCallback(() => {

@@ -1,46 +1,7 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import './ExpensesPage.css';
 
-// ─── Mock Data ───────────────────────────────────────────────
-
-const MOCK_VEHICLES = [
-  { id: 1, registration_number: 'VAN-05', model_name: 'Ford Transit' },
-  { id: 2, registration_number: 'TRK-12', model_name: 'Volvo FH16' },
-  { id: 3, registration_number: 'PKP-03', model_name: 'Toyota Hilux' },
-  { id: 4, registration_number: 'VAN-08', model_name: 'Mercedes Sprinter' },
-  { id: 5, registration_number: 'SEM-01', model_name: 'Scania R450' },
-  { id: 6, registration_number: 'TRK-07', model_name: 'MAN TGX' },
-];
-
-const INITIAL_FUEL_LOGS = [
-  { id: 1, vehicle_id: 1, liters: 45, cost: 4725, date: '2026-07-11', trip_number: 'TRP-A1B2C3D4' },
-  { id: 2, vehicle_id: 2, liters: 120, cost: 12600, date: '2026-07-10', trip_number: 'TRP-E5F6G7H8' },
-  { id: 3, vehicle_id: 3, liters: 42, cost: 4410, date: '2026-07-08', trip_number: 'TRP-I9J0K1L2' },
-  { id: 4, vehicle_id: 1, liters: 50, cost: 5250, date: '2026-07-05', trip_number: 'TRP-C9D0E1F2' },
-  { id: 5, vehicle_id: 4, liters: 55, cost: 5775, date: '2026-07-04', trip_number: null },
-  { id: 6, vehicle_id: 2, liters: 130, cost: 13650, date: '2026-07-03', trip_number: null },
-  { id: 7, vehicle_id: 6, liters: 80, cost: 8400, date: '2026-07-02', trip_number: null },
-  { id: 8, vehicle_id: 3, liters: 38, cost: 3990, date: '2026-06-30', trip_number: null },
-  { id: 9, vehicle_id: 5, liters: 150, cost: 15750, date: '2026-06-28', trip_number: null },
-  { id: 10, vehicle_id: 1, liters: 48, cost: 5040, date: '2026-06-26', trip_number: null },
-];
-
-const INITIAL_EXPENSES = [
-  { id: 1, vehicle_id: 1, trip_id: 1, expense_type: 'Toll', cost: 350, description: 'Mumbai-Pune Expressway toll', date: '2026-07-11' },
-  { id: 2, vehicle_id: 2, trip_id: 2, expense_type: 'Toll', cost: 520, description: 'NH-48 toll gates', date: '2026-07-10' },
-  { id: 3, vehicle_id: 3, trip_id: null, expense_type: 'Maintenance Cost', cost: 4500, description: 'Engine oil change', date: '2026-07-10' },
-  { id: 4, vehicle_id: 5, trip_id: null, expense_type: 'Maintenance Cost', cost: 12000, description: 'Brake pad replacement', date: '2026-07-09' },
-  { id: 5, vehicle_id: 1, trip_id: null, expense_type: 'Permit', cost: 2500, description: 'Interstate transport permit renewal', date: '2026-07-08' },
-  { id: 6, vehicle_id: 2, trip_id: null, expense_type: 'Toll', cost: 780, description: 'Delhi-Jaipur expressway', date: '2026-07-07' },
-  { id: 7, vehicle_id: 4, trip_id: null, expense_type: 'Other', cost: 1200, description: 'Parking charges — 3 days', date: '2026-07-06' },
-  { id: 8, vehicle_id: 6, trip_id: null, expense_type: 'Maintenance Cost', cost: 6000, description: 'Battery replacement', date: '2026-06-28' },
-  { id: 9, vehicle_id: 1, trip_id: null, expense_type: 'Other', cost: 800, description: 'Vehicle wash and cleaning', date: '2026-06-27' },
-  { id: 10, vehicle_id: 3, trip_id: null, expense_type: 'Toll', cost: 290, description: 'Bangalore-Chennai highway', date: '2026-06-25' },
-  { id: 11, vehicle_id: 2, trip_id: null, expense_type: 'Maintenance Cost', cost: 8500, description: 'Transmission fluid flush', date: '2026-07-04' },
-  { id: 12, vehicle_id: 4, trip_id: null, expense_type: 'Maintenance Cost', cost: 15000, description: 'AC compressor repair', date: '2026-07-02' },
-];
-
-const getVehicle = (id) => MOCK_VEHICLES.find(v => v.id === id);
+// ─── Helper Functions ────────────────────────────────────────
 const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 const formatCurrency = (val) => `₹${val.toLocaleString()}`;
 
@@ -55,7 +16,7 @@ const EXPENSE_TYPE_COLORS = {
 // ─── Sub-Components ──────────────────────────────────────────
 
 function AddFuelLogModal({ onClose, onSubmit, vehicles }) {
-  const [form, setForm] = useState({ vehicle_id: '', liters: '', cost: '', date: new Date().toISOString().split('T')[0] });
+  const [form, setForm] = useState({ vehicle: '', liters: '', cost: '', date: new Date().toISOString().split('T')[0] });
   const [errors, setErrors] = useState({});
 
   const handleChange = (field, value) => {
@@ -65,7 +26,7 @@ function AddFuelLogModal({ onClose, onSubmit, vehicles }) {
 
   const validate = () => {
     const errs = {};
-    if (!form.vehicle_id) errs.vehicle_id = 'Required';
+    if (!form.vehicle) errs.vehicle = 'Required';
     if (!form.liters || Number(form.liters) <= 0) errs.liters = 'Required';
     if (!form.cost || Number(form.cost) <= 0) errs.cost = 'Required';
     if (!form.date) errs.date = 'Required';
@@ -76,7 +37,7 @@ function AddFuelLogModal({ onClose, onSubmit, vehicles }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
-    onSubmit({ ...form, vehicle_id: Number(form.vehicle_id), liters: Number(form.liters), cost: Number(form.cost) });
+    onSubmit({ ...form, vehicle: Number(form.vehicle), liters: Number(form.liters), cost: Number(form.cost) });
   };
 
   return (
@@ -89,11 +50,11 @@ function AddFuelLogModal({ onClose, onSubmit, vehicles }) {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="input-label">Vehicle</label>
-            <select className="input-field" value={form.vehicle_id} onChange={e => handleChange('vehicle_id', e.target.value)}>
+            <select className="input-field" value={form.vehicle} onChange={e => handleChange('vehicle', e.target.value)}>
               <option value="">Select vehicle...</option>
               {vehicles.map(v => <option key={v.id} value={v.id}>{v.registration_number} — {v.model_name}</option>)}
             </select>
-            {errors.vehicle_id && <div className="form-error">{errors.vehicle_id}</div>}
+            {errors.vehicle && <div className="form-error">{errors.vehicle}</div>}
           </div>
           <div className="form-row">
             <div className="form-group">
@@ -123,7 +84,7 @@ function AddFuelLogModal({ onClose, onSubmit, vehicles }) {
 }
 
 function AddExpenseModal({ onClose, onSubmit, vehicles }) {
-  const [form, setForm] = useState({ vehicle_id: '', expense_type: '', cost: '', description: '', date: new Date().toISOString().split('T')[0] });
+  const [form, setForm] = useState({ vehicle: '', expense_type: '', cost: '', description: '', date: new Date().toISOString().split('T')[0] });
   const [errors, setErrors] = useState({});
 
   const handleChange = (field, value) => {
@@ -133,7 +94,7 @@ function AddExpenseModal({ onClose, onSubmit, vehicles }) {
 
   const validate = () => {
     const errs = {};
-    if (!form.vehicle_id) errs.vehicle_id = 'Required';
+    if (!form.vehicle) errs.vehicle = 'Required';
     if (!form.expense_type) errs.expense_type = 'Required';
     if (!form.cost || Number(form.cost) <= 0) errs.cost = 'Required';
     if (!form.date) errs.date = 'Required';
@@ -144,7 +105,7 @@ function AddExpenseModal({ onClose, onSubmit, vehicles }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
-    onSubmit({ ...form, vehicle_id: Number(form.vehicle_id), cost: Number(form.cost) });
+    onSubmit({ ...form, vehicle: Number(form.vehicle), cost: Number(form.cost) });
   };
 
   return (
@@ -158,11 +119,11 @@ function AddExpenseModal({ onClose, onSubmit, vehicles }) {
           <div className="form-row">
             <div className="form-group">
               <label className="input-label">Vehicle</label>
-              <select className="input-field" value={form.vehicle_id} onChange={e => handleChange('vehicle_id', e.target.value)}>
+              <select className="input-field" value={form.vehicle} onChange={e => handleChange('vehicle', e.target.value)}>
                 <option value="">Select vehicle...</option>
                 {vehicles.map(v => <option key={v.id} value={v.id}>{v.registration_number} — {v.model_name}</option>)}
               </select>
-              {errors.vehicle_id && <div className="form-error">{errors.vehicle_id}</div>}
+              {errors.vehicle && <div className="form-error">{errors.vehicle}</div>}
             </div>
             <div className="form-group">
               <label className="input-label">Expense Type</label>
@@ -202,8 +163,8 @@ function AddExpenseModal({ onClose, onSubmit, vehicles }) {
   );
 }
 
-function VehicleSummaryCard({ vehicleId, fuelCost, maintCost, tollCost, otherCost, totalCost }) {
-  const vehicle = getVehicle(vehicleId);
+function VehicleSummaryCard({ vehicleId, vehicles, fuelCost, maintCost, tollCost, otherCost, totalCost }) {
+  const vehicle = vehicles.find(v => v.id === vehicleId);
   if (!vehicle) return null;
   const items = [
     { label: 'Fuel', value: fuelCost, color: '#4285f4' },
@@ -268,8 +229,9 @@ function ToastContainer({ toasts, onRemove }) {
 // ═══════════════════════════════════════════════════════════════
 
 export default function ExpensesPage() {
-  const [fuelLogs, setFuelLogs] = useState(INITIAL_FUEL_LOGS);
-  const [expenses, setExpenses] = useState(INITIAL_EXPENSES);
+  const [fuelLogs, setFuelLogs] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
   const [activeTab, setActiveTab] = useState('fuel');
   const [vehicleFilter, setVehicleFilter] = useState('all');
   const [showFuelModal, setShowFuelModal] = useState(false);
@@ -285,6 +247,38 @@ export default function ExpensesPage() {
   const removeToast = useCallback((id) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
+
+  const fetchAllData = useCallback(async () => {
+    try {
+      const token = JSON.parse(localStorage.getItem('transitops_user'))?.token;
+      const headers = { 'Authorization': `Bearer ${token}` };
+
+      const [fuelRes, expRes, vehRes] = await Promise.all([
+        fetch('http://127.0.0.1:8000/api/fuel-logs/', { headers }),
+        fetch('http://127.0.0.1:8000/api/expenses/', { headers }),
+        fetch('http://127.0.0.1:8000/api/fleet/vehicles/', { headers }),
+      ]);
+
+      if (fuelRes.ok) {
+        const data = await fuelRes.json();
+        setFuelLogs(Array.isArray(data) ? data : data.results || []);
+      }
+      if (expRes.ok) {
+        const data = await expRes.json();
+        setExpenses(Array.isArray(data) ? data : data.results || []);
+      }
+      if (vehRes.ok) {
+        const data = await vehRes.json();
+        setVehicles(Array.isArray(data) ? data : data.results || []);
+      }
+    } catch (err) {
+      console.error('Error fetching data:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAllData();
+  }, [fetchAllData]);
 
   // ── KPIs ──
   const kpis = useMemo(() => {
@@ -304,25 +298,25 @@ export default function ExpensesPage() {
   // ── Per-vehicle summaries ──
   const vehicleSummaries = useMemo(() => {
     const map = {};
-    MOCK_VEHICLES.forEach(v => {
+    vehicles.forEach(v => {
       map[v.id] = { fuelCost: 0, maintCost: 0, tollCost: 0, otherCost: 0, totalCost: 0 };
     });
     fuelLogs.forEach(l => {
-      if (map[l.vehicle_id]) {
-        map[l.vehicle_id].fuelCost += l.cost;
-        map[l.vehicle_id].totalCost += l.cost;
+      if (map[l.vehicle]) {
+        map[l.vehicle].fuelCost += l.cost;
+        map[l.vehicle].totalCost += l.cost;
       }
     });
     expenses.forEach(e => {
-      if (!map[e.vehicle_id]) return;
+      if (!map[e.vehicle]) return;
       if (e.expense_type === 'Maintenance Cost') {
-        map[e.vehicle_id].maintCost += e.cost;
+        map[e.vehicle].maintCost += e.cost;
       } else if (e.expense_type === 'Toll') {
-        map[e.vehicle_id].tollCost += e.cost;
+        map[e.vehicle].tollCost += e.cost;
       } else {
-        map[e.vehicle_id].otherCost += e.cost;
+        map[e.vehicle].otherCost += e.cost;
       }
-      map[e.vehicle_id].totalCost += e.cost;
+      map[e.vehicle].totalCost += e.cost;
     });
     return Object.entries(map)
       .filter(([, data]) => data.totalCost > 0)
@@ -332,25 +326,58 @@ export default function ExpensesPage() {
   // ── Filtered data ──
   const filteredFuelLogs = useMemo(() => {
     if (vehicleFilter === 'all') return fuelLogs;
-    return fuelLogs.filter(l => l.vehicle_id === Number(vehicleFilter));
+    return fuelLogs.filter(l => l.vehicle === Number(vehicleFilter));
   }, [fuelLogs, vehicleFilter]);
 
   const filteredExpenses = useMemo(() => {
     if (vehicleFilter === 'all') return expenses;
-    return expenses.filter(e => e.vehicle_id === Number(vehicleFilter));
+    return expenses.filter(e => e.vehicle === Number(vehicleFilter));
   }, [expenses, vehicleFilter]);
 
-  const handleAddFuelLog = useCallback((data) => {
-    setFuelLogs(prev => [{ id: Date.now(), ...data, trip_number: null }, ...prev]);
-    setShowFuelModal(false);
-    addToast('Fuel log added successfully');
-  }, [addToast]);
+  const getAuthHeaders = () => ({
+    'Authorization': `Bearer ${JSON.parse(localStorage.getItem('transitops_user'))?.token}`,
+    'Content-Type': 'application/json'
+  });
 
-  const handleAddExpense = useCallback((data) => {
-    setExpenses(prev => [{ id: Date.now(), trip_id: null, ...data }, ...prev]);
-    setShowExpenseModal(false);
-    addToast('Expense recorded successfully');
-  }, [addToast]);
+  const handleAddFuelLog = useCallback(async (data) => {
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/fuel-logs/', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        setShowFuelModal(false);
+        addToast('Fuel log added successfully');
+        fetchAllData();
+      } else {
+        const err = await res.json();
+        addToast(`Error: ${JSON.stringify(err)}`, 'error');
+      }
+    } catch (e) {
+      addToast('Network error', 'error');
+    }
+  }, [addToast, fetchAllData]);
+
+  const handleAddExpense = useCallback(async (data) => {
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/expenses/', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        setShowExpenseModal(false);
+        addToast('Expense recorded successfully');
+        fetchAllData();
+      } else {
+        const err = await res.json();
+        addToast(`Error: ${JSON.stringify(err)}`, 'error');
+      }
+    } catch (e) {
+      addToast('Network error', 'error');
+    }
+  }, [addToast, fetchAllData]);
 
   return (
     <div className="expenses-page grid-bg">
@@ -404,7 +431,7 @@ export default function ExpensesPage() {
               <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Vehicle</span>
               <select className="filter-select" value={vehicleFilter} onChange={e => setVehicleFilter(e.target.value)}>
                 <option value="all">All Vehicles</option>
-                {MOCK_VEHICLES.map(v => <option key={v.id} value={v.id}>{v.registration_number}</option>)}
+                {vehicles.map(v => <option key={v.id} value={v.id}>{v.registration_number}</option>)}
               </select>
             </div>
           )}
@@ -429,7 +456,7 @@ export default function ExpensesPage() {
                   <tr><td colSpan={6} style={{ textAlign: 'center', padding: '48px', color: 'var(--text-muted)' }}>No fuel logs found.</td></tr>
                 ) : (
                   filteredFuelLogs.map(log => {
-                    const vehicle = getVehicle(log.vehicle_id);
+                    const vehicle = vehicles.find(v => v.id === log.vehicle);
                     return (
                       <tr key={log.id}>
                         <td>{formatDate(log.date)}</td>
@@ -466,7 +493,7 @@ export default function ExpensesPage() {
                   <tr><td colSpan={5} style={{ textAlign: 'center', padding: '48px', color: 'var(--text-muted)' }}>No expenses found.</td></tr>
                 ) : (
                   filteredExpenses.map(exp => {
-                    const vehicle = getVehicle(exp.vehicle_id);
+                    const vehicle = vehicles.find(v => v.id === exp.vehicle);
                     const typeInfo = EXPENSE_TYPE_COLORS[exp.expense_type] || EXPENSE_TYPE_COLORS['Other'];
                     return (
                       <tr key={exp.id}>
@@ -490,6 +517,7 @@ export default function ExpensesPage() {
               <VehicleSummaryCard
                 key={vehicleId}
                 vehicleId={Number(vehicleId)}
+                vehicles={vehicles}
                 fuelCost={data.fuelCost}
                 maintCost={data.maintCost}
                 tollCost={data.tollCost}
@@ -502,8 +530,8 @@ export default function ExpensesPage() {
       </div>
 
       {/* Modals */}
-      {showFuelModal && <AddFuelLogModal onClose={() => setShowFuelModal(false)} onSubmit={handleAddFuelLog} vehicles={MOCK_VEHICLES} />}
-      {showExpenseModal && <AddExpenseModal onClose={() => setShowExpenseModal(false)} onSubmit={handleAddExpense} vehicles={MOCK_VEHICLES} />}
+      {showFuelModal && <AddFuelLogModal onClose={() => setShowFuelModal(false)} onSubmit={handleAddFuelLog} vehicles={vehicles} />}
+      {showExpenseModal && <AddExpenseModal onClose={() => setShowExpenseModal(false)} onSubmit={handleAddExpense} vehicles={vehicles} />}
 
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
