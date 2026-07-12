@@ -1,0 +1,222 @@
+/* ═══════════════════════════════════════════════════
+   VehiclesPage — Vehicle Registry
+   ═══════════════════════════════════════════════════ */
+
+.vehicles-page {
+  animation: fadeIn 0.4s var(--ease-default);
+}
+
+/* ── Action Bar ── */
+.vehicles-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.vehicles-filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.vehicles-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vehicles-search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.vehicles-search-input {
+  background: var(--bg-subtle);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px 8px 32px;
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s ease;
+  width: 200px;
+}
+
+.vehicles-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.vehicles-search-input:focus {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 0 3px rgba(0, 224, 90, 0.1);
+}
+
+.vehicles-search-input:hover:not(:focus) {
+  border-color: var(--border-strong);
+}
+
+.vehicles-add-btn {
+  background: var(--accent-green);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 10px 24px;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-default);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.vehicles-add-btn:hover {
+  background: var(--accent-green-hover);
+  box-shadow: var(--shadow-green-glow);
+  transform: translateY(-1px);
+}
+
+
+/* ── Data Table ── */
+.vehicles-table-container {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.vehicles-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.vehicles-table thead th {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  position: sticky;
+  top: 0;
+  white-space: nowrap;
+}
+
+.vehicles-table tbody tr {
+  animation: staggerFadeIn 0.4s var(--ease-default) both;
+}
+
+.vehicles-table tbody td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.15s ease;
+}
+
+.vehicles-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.vehicles-table tbody tr:hover td {
+  background: var(--bg-subtle);
+}
+
+/* Cell variants */
+.vehicles-table .cell-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.vehicles-table .cell-reg {
+  color: var(--accent-amber);
+}
+
+.vehicles-table .cell-model {
+  font-weight: 500;
+}
+
+.vehicles-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--space-12) var(--space-4) !important;
+  font-size: 14px;
+}
+
+
+/* ── Rule Note ── */
+.vehicles-rule-note {
+  margin-top: var(--space-5);
+  font-size: 12px;
+  color: var(--accent-amber);
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
+.vehicles-rule-note .rule-prefix {
+  font-weight: 700;
+}
+
+
+/* ── Form Error (inside modal) ── */
+.vehicles-form-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--accent-red-muted);
+  border: 1px solid rgba(255, 59, 59, 0.3);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent-red);
+  animation: slideUp 0.3s var(--ease-spring);
+}
+
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .vehicles-action-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .vehicles-add-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .vehicles-table-container {
+    overflow-x: auto;
+  }
+
+  .vehicles-table {
+    min-width: 800px;
+  }
+}
+
+@media (max-width: 640px) {
+  .vehicles-filters {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .vehicles-filters .filter-select,
+  .vehicles-search-input {
+    width: 100%;
+  }
+}

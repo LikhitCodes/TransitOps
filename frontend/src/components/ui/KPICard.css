@@ -1,0 +1,56 @@
+/* ═══════════════════════════════════════════════════
+   KPICard — Design System §6.7
+   ═══════════════════════════════════════════════════ */
+
+.kpi-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s var(--ease-default);
+  animation: staggerFadeIn 0.5s var(--ease-default) both;
+}
+
+/* Left accent stripe */
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+
+.kpi-card--green::before  { background: var(--accent-green); }
+.kpi-card--blue::before   { background: var(--accent-blue); }
+.kpi-card--amber::before  { background: var(--accent-amber); }
+.kpi-card--orange::before { background: var(--accent-orange); }
+
+.kpi-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.kpi-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+  line-height: 1.4;
+}
+
+.kpi-value {
+  display: block;
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+  line-height: 1;
+}
