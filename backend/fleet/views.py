@@ -52,11 +52,8 @@ class VehicleViewSet(viewsets.ModelViewSet):
     # Permissions
     # ------------------------------------------------------------------
     def get_permissions(self):
-        if self.action in ('list', 'retrieve', 'available'):
+        if self.action == 'available':
             return [IsAuthenticated()]
-        if self.action == 'destroy':
-            return [IsFleetManager()]
-        # create, update, partial_update
         return [IsFleetManager()]
 
     # ------------------------------------------------------------------
@@ -163,11 +160,12 @@ class DriverViewSet(viewsets.ModelViewSet):
     # Permissions
     # ------------------------------------------------------------------
     def get_permissions(self):
-        if self.action in ('list', 'retrieve', 'eligible'):
+        if self.action == 'eligible':
             return [IsAuthenticated()]
+        
         if self.action == 'destroy':
-            return [IsFleetManager()]
-        # create, update, partial_update
+            return [IsSafetyOfficer()]
+            
         return [IsFleetManagerOrSafetyOfficer()]
 
     # ------------------------------------------------------------------

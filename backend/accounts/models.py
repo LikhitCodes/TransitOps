@@ -13,14 +13,14 @@ class CustomUser(AbstractUser):
 
     class Role(models.TextChoices):
         FLEET_MANAGER     = 'Fleet Manager',     'Fleet Manager'
-        DRIVER            = 'Driver',            'Driver'
+        DISPATCHER        = 'Dispatcher',        'Dispatcher'
         SAFETY_OFFICER    = 'Safety Officer',    'Safety Officer'
         FINANCIAL_ANALYST = 'Financial Analyst', 'Financial Analyst'
 
     role  = models.CharField(
         max_length=20,
         choices=Role.choices,
-        default=Role.DRIVER,
+        default=Role.DISPATCHER,
     )
     phone = models.CharField(max_length=20, blank=True)
 

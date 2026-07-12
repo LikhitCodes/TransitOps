@@ -10,7 +10,7 @@ from operations.models import Trip, Expense
 from accounts.permissions import IsFinancialAnalyst
 
 @api_view(['GET'])
-@permission_classes([AllowAny]) # Changed to AllowAny temporarily for ease of testing if you reverted the RBAC, otherwise you can use [IsAuthenticated, IsFinancialAnalyst]
+@permission_classes([IsAuthenticated])
 def dashboard_metrics(request):
     """
     GET /api/analytics/dashboard/
@@ -70,7 +70,7 @@ def dashboard_metrics(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsFinancialAnalyst])
 def export_csv(request):
     """
     GET /api/analytics/export/csv/
@@ -114,7 +114,7 @@ def export_csv(request):
     return response
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def kpi_overview(request):
     """
     GET /api/analytics/kpis/

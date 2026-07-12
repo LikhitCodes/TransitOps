@@ -13,11 +13,11 @@ class IsFleetManager(BasePermission):
         return _is_authenticated(request) and request.user.role == 'Fleet Manager'
 
 
-class IsDriverRole(BasePermission):
-    """Grants access only to users with the Driver role."""
+class IsDispatcher(BasePermission):
+    """Grants access only to users with the Dispatcher role."""
 
     def has_permission(self, request, view):
-        return _is_authenticated(request) and request.user.role == 'Driver'
+        return _is_authenticated(request) and request.user.role == 'Dispatcher'
 
 
 class IsSafetyOfficer(BasePermission):

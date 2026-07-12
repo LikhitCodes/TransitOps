@@ -1,6 +1,6 @@
 from django.db.models import Sum, Q
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from accounts.permissions import IsDispatcher, IsFleetManager, IsFinancialAnalyst
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -24,7 +24,7 @@ from operations.validators import (
 # ═══════════════════════════════════════════════
 
 @api_view(['GET', 'POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsDispatcher])
 def trip_list_create(request):
     """
     GET  /api/trips/          → List all trips (filterable by status)
@@ -61,7 +61,7 @@ def trip_list_create(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsDispatcher])
 def trip_detail(request, pk):
     """
     GET /api/trips/{id}/      → Trip detail
@@ -79,7 +79,7 @@ def trip_detail(request, pk):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsDispatcher])
 def trip_dispatch(request, pk):
     """
     POST /api/trips/{id}/dispatch/    → Draft → Dispatched
@@ -98,7 +98,7 @@ def trip_dispatch(request, pk):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsDispatcher])
 def trip_complete(request, pk):
     """
     POST /api/trips/{id}/complete/    → Dispatched → Completed
@@ -131,7 +131,7 @@ def trip_complete(request, pk):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsDispatcher])
 def trip_cancel(request, pk):
     """
     POST /api/trips/{id}/cancel/      → Draft/Dispatched → Cancelled
@@ -155,7 +155,7 @@ def trip_cancel(request, pk):
 # ═══════════════════════════════════════════════
 
 @api_view(['GET', 'POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsFleetManager])
 def maintenance_list_create(request):
     """
     GET  /api/maintenance/        → List all maintenance logs
@@ -205,7 +205,7 @@ def maintenance_list_create(request):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsFleetManager])
 def maintenance_close(request, pk):
     """
     POST /api/maintenance/{id}/close/  → Close maintenance → vehicle becomes 'Available'
@@ -244,7 +244,7 @@ def maintenance_close(request, pk):
 # ═══════════════════════════════════════════════
 
 @api_view(['GET', 'POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsFinancialAnalyst])
 def fuel_log_list_create(request):
     """
     GET  /api/fuel-logs/      → List fuel logs (filterable by vehicle, date range)
@@ -284,7 +284,7 @@ def fuel_log_list_create(request):
 # ═══════════════════════════════════════════════
 
 @api_view(['GET', 'POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsFinancialAnalyst])
 def expense_list_create(request):
     """
     GET  /api/expenses/       → List all expenses (filterable by vehicle, type, date range)
@@ -330,7 +330,7 @@ def expense_list_create(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsFinancialAnalyst])
 def expense_summary(request):
     """
     GET /api/expenses/summary/  → Total operational cost per vehicle

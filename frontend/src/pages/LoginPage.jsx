@@ -1,37 +1,39 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth, ROLE_DEFAULT_ROUTE } from '../context/AuthContext';
 import TransitOpsLogo from '../components/TransitOpsLogo';
 import './LoginPage.css';
 
 const ROLES = [
   'Fleet Manager',
-  'Driver',
+  'Dispatcher',
   'Safety Officer',
   'Financial Analyst',
 ];
 
 const DEMO_USERS = {
   'Fleet Manager':     { email: 'fleet@transitops.com', password: 'transit123' },
-  'Driver':            { email: 'driver@transitops.com', password: 'transit123' },
+  'Dispatcher':        { email: 'dispatcher@transitops.com', password: 'transit123' },
   'Safety Officer':    { email: 'safety@transitops.com', password: 'transit123' },
   'Financial Analyst': { email: 'finance@transitops.com', password: 'transit123' },
 };
 
 const ACCESS_SCOPES = [
   { role: 'Fleet Manager',     modules: 'Fleet, Maintenance' },
-  { role: 'Driver',            modules: 'Dashboard, Trips' },
+  { role: 'Dispatcher',        modules: 'Dashboard, Trips' },
   { role: 'Safety Officer',    modules: 'Drivers, Compliance' },
   { role: 'Financial Analyst', modules: 'Fuel & Expenses, Analytics' },
 ];
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const successMessage = location.state?.message;
   const { login, isLockedOut, lockoutRemaining } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('Driver');
+  const [role, setRole] = useState('Dispatcher');
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -110,6 +112,18 @@ export default function LoginPage() {
         <div className="login-form-container">
           <h2 className="login-heading">Sign in to your account</h2>
           <p className="login-subheading">Enter your credentials to continue</p>
+
+          {/* Success Alert */}
+          {successMessage && (
+            <div className="login-error" role="alert" style={{ background: 'var(--accent-green-muted)', color: 'var(--accent-green)', borderColor: 'var(--accent-green)' }}>
+              <span className="login-error-icon">
+                <svg viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M8 15A7 7 0 108 1a7 7 0 000 14zm3.78-8.22l-4.5 4.5a.75.75 0 01-1.06 0l-2-2a.75.75 0 011.06-1.06L7 9.94l3.72-3.72a.75.75 0 011.06 1.06z" />
+                </svg>
+              </span>
+              <span className="login-error-text">{successMessage}</span>
+            </div>
+          )}
 
           {/* Error Alert */}
           {error && (
@@ -246,6 +260,10 @@ export default function LoginPage() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div style={{ marginTop: '32px', textAlign: 'center', fontFamily: 'var(--font-primary)', fontSize: '14px', color: 'var(--text-secondary)' }}>
+            Don't have an account? <Link to="/signup" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Sign up here</Link>
           </div>
         </div>
       </main>

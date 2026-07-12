@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
+import SignupPage from './pages/SignupPage'
 import DashboardPage from './pages/DashboardPage'
 import VehiclesPage from './pages/VehiclesPage'
 import DriversPage from './pages/DriversPage'
@@ -11,6 +12,8 @@ import ReportsPage from './pages/ReportsPage'
 import SettingsPage from './pages/SettingsPage'
 import AppLayout from './components/Layout/AppLayout'
 
+import ProtectedRoute from './components/Layout/ProtectedRoute'
+
 function App() {
   return (
     <Routes>
@@ -19,9 +22,14 @@ function App() {
 
       {/* Public routes */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
 
       {/* Authenticated routes — wrapped in AppLayout (Sidebar + Topbar) */}
-      <Route element={<AppLayout />}>
+      <Route element={
+        <ProtectedRoute>
+          <AppLayout />
+        </ProtectedRoute>
+      }>
         <Route path="/dashboard" element={<DashboardPage />} />
 
         <Route path="/fleet" element={<VehiclesPage />} />

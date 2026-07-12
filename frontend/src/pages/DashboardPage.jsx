@@ -11,6 +11,8 @@ import './DashboardPage.css';
  * 2. KPI row (7 cards with animated counters)
  * 3. Bottom section: Recent Trips table (left 60%) + Vehicle Status bars (right 40%)
  */
+import { api } from '../api/client';
+
 export default function DashboardPage() {
   const [kpis, setKpis] = useState({
     active_vehicles: 0,
@@ -22,27 +24,20 @@ export default function DashboardPage() {
     fleet_utilization_percent: 0,
   });
   const [recentTrips, setRecentTrips] = useState([]);
+  const [filters, setFilters] = useState({ vehicleType: 'All', status: 'All', region: 'All' });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = JSON.parse(localStorage.getItem('transitops_user'))?.token;
-        const headers = { 'Authorization': `Bearer ${token}` };
-
-        const [kpiRes, tripsRes] = await Promise.all([
-          fetch('http://127.0.0.1:8000/api/analytics/kpis/', { headers }),
-          fetch('http://127.0.0.1:8000/api/trips/', { headers })
+        const [kpiData, tripsData] = await Promise.all([
+          api.get('/analytics/kpis/'),
+          api.get('/trips/')
         ]);
 
-        if (kpiRes.ok) {
-          const kpiData = await kpiRes.json();
-          setKpis(kpiData);
-        }
+        if (kpiData) setKpis(kpiData);
 
-        if (tripsRes.ok) {
-          const tripsData = await tripsRes.json();
-          // Assuming the backend returns an array or paginated object
+        if (tripsData) {
           const tripsArray = Array.isArray(tripsData) ? tripsData : (tripsData.results || []);
           setRecentTrips(tripsArray.slice(0, 4));
         }

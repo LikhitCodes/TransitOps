@@ -7,8 +7,8 @@ const AuthContext = createContext(null);
  * Used after login to determine which pages the user can access.
  */
 export const ROLE_ROUTES = {
-  'Fleet Manager':      ['/fleet', '/maintenance'],
-  'Driver':             ['/dashboard', '/trips'],
+  'Fleet Manager':      ['/fleet', '/maintenance', '/settings'],
+  'Dispatcher':         ['/dashboard', '/trips'],
   'Safety Officer':     ['/drivers', '/compliance'],
   'Financial Analyst':  ['/fuel-expenses', '/analytics'],
 };
@@ -18,7 +18,7 @@ export const ROLE_ROUTES = {
  */
 export const ROLE_DEFAULT_ROUTE = {
   'Fleet Manager':      '/fleet',
-  'Driver':             '/dashboard',
+  'Dispatcher':         '/dashboard',
   'Safety Officer':     '/drivers',
   'Financial Analyst':  '/fuel-expenses',
 };
