@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from fleet.models import Vehicle
+from fleet.models import Vehicle, Driver
 from operations.models import Trip, Expense
 from accounts.permissions import IsFinancialAnalyst
 
@@ -112,3 +112,38 @@ def export_csv(request):
         ])
 
     return response
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def kpi_overview(request):
+    """
+    GET /api/analytics/kpis/
+    Returns high-level fleet KPIs:
+    Active Vehicles, Available Vehicles, Vehicles in Maintenance,
+    Active Trips, Pending Trips, Drivers On Duty, and Fleet Utilization.
+    """
+    # Vehicle metrics
+    total_vehicles = Vehicle.objects.exclude(status='Retired').count()
+    active_vehicles = Vehicle.objects.filter(status='On Trip').count()
+    available_vehicles = Vehicle.objects.filter(status='Available').count()
+    maintenance_vehicles = Vehicle.objects.filter(status='In Shop').count()
+
+    # Utilization
+    fleet_utilization = round((active_vehicles / total_vehicles) * 100, 1) if total_vehicles > 0 else 0
+
+    # Trip metrics
+    active_trips = Trip.objects.filter(status='Dispatched').count()
+    pending_trips = Trip.objects.filter(status='Draft').count()
+
+    # Driver metrics
+    drivers_on_duty = Driver.objects.filter(status='On Trip').count()
+
+    return Response({
+        'active_vehicles': active_vehicles,
+        'available_vehicles': available_vehicles,
+        'vehicles_in_maintenance': maintenance_vehicles,
+        'active_trips': active_trips,
+        'pending_trips': pending_trips,
+        'drivers_on_duty': drivers_on_duty,
+        'fleet_utilization_percent': fleet_utilization
+    })
