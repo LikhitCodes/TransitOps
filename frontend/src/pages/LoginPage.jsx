@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, ROLE_DEFAULT_ROUTE } from '../context/AuthContext';
+import { useAuth, MOCK_USERS, ROLE_DEFAULT_ROUTE } from '../context/AuthContext';
 import TransitOpsLogo from '../components/TransitOpsLogo';
 import './LoginPage.css';
 
@@ -69,15 +69,29 @@ export default function LoginPage() {
           <p className="login-brand-tagline">Smart Transport Operations Platform</p>
 
           <div className="login-roles-section">
-            <h2 className="login-roles-title">One login, four roles:</h2>
-            <ul className="login-roles-list">
-              {ROLES.map((r) => (
-                <li key={r}>
-                  <span className="login-role-dot" />
-                  {r}
-                </li>
-              ))}
-            </ul>
+            <h2 className="login-roles-title">Demo Credentials:</h2>
+            <div className="login-roles-cards">
+              {ROLES.map((r) => {
+                const mockUser = MOCK_USERS[r];
+                return (
+                  <button 
+                    key={r} 
+                    className="login-role-card"
+                    onClick={() => {
+                      setRole(r);
+                      setEmail(mockUser.email);
+                      setPassword(mockUser.password);
+                    }}
+                  >
+                    <span className="login-role-dot" />
+                    <div className="login-role-card-info">
+                      <span className="login-role-name">{r}</span>
+                      <span className="login-role-email">{mockUser.email}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 

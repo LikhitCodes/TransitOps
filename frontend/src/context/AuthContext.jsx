@@ -26,10 +26,12 @@ export const ROLE_DEFAULT_ROUTE = {
 const LOCKOUT_DURATION_MS = 10 * 60 * 1000; // 10 minutes
 const MAX_FAILED_ATTEMPTS = 5;
 
-// Mock credentials for frontend-only testing
-const MOCK_CREDENTIALS = {
-  email: 'raveenk@transitops.in',
-  password: 'password123',
+// Mock credentials for frontend-only testing (one for each role)
+export const MOCK_USERS = {
+  'Fleet Manager':     { email: 'fleet@transitops.in', password: 'password123' },
+  'Dispatcher':        { email: 'dispatcher@transitops.in', password: 'password123' },
+  'Safety Officer':    { email: 'safety@transitops.in', password: 'password123' },
+  'Financial Analyst': { email: 'finance@transitops.in', password: 'password123' },
 };
 
 export function AuthProvider({ children }) {
@@ -87,9 +89,10 @@ export function AuthProvider({ children }) {
     }
 
     // Simulate authentication
-    const isValid =
-      email.toLowerCase() === MOCK_CREDENTIALS.email &&
-      password === MOCK_CREDENTIALS.password;
+    const mockUser = MOCK_USERS[role];
+    const isValid = mockUser &&
+      email.toLowerCase() === mockUser.email &&
+      password === mockUser.password;
 
     if (!isValid) {
       const newAttempts = failedAttempts + 1;

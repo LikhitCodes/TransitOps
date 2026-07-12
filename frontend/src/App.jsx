@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import VehiclesPage from './pages/VehiclesPage'
@@ -8,6 +9,9 @@ import AppLayout from './components/Layout/AppLayout'
 function App() {
   return (
     <Routes>
+      {/* Root — Landing page */}
+      <Route path="/" element={<LandingPage />} />
+
       {/* Public routes */}
       <Route path="/login" element={<LoginPage />} />
 
@@ -25,9 +29,8 @@ function App() {
         <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
       </Route>
 
-      {/* Redirects */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
