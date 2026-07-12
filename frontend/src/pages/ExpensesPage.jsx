@@ -413,7 +413,7 @@ export default function ExpensesPage() {
         {/* Tab Content */}
         {activeTab === 'fuel' && (
           <div className="expense-table-container">
-            <table className="data-table">
+            <table className="expense-table">
               <thead>
                 <tr>
                   <th>Date</th>
@@ -428,16 +428,16 @@ export default function ExpensesPage() {
                 {filteredFuelLogs.length === 0 ? (
                   <tr><td colSpan={6} style={{ textAlign: 'center', padding: '48px', color: 'var(--text-muted)' }}>No fuel logs found.</td></tr>
                 ) : (
-                  filteredFuelLogs.map(log => {
+                  filteredFuelLogs.map((log, i) => {
                     const vehicle = getVehicle(log.vehicle_id);
                     return (
-                      <tr key={log.id}>
-                        <td>{formatDate(log.date)}</td>
+                      <tr key={log.id} style={{ animationDelay: `${i * 40}ms` }}>
+                        <td className="cell-bold">{formatDate(log.date)}</td>
                         <td className="cell-mono">{vehicle?.registration_number}</td>
                         <td className="cell-mono">{log.liters} L</td>
                         <td className="cell-mono">{formatCurrency(log.cost)}</td>
                         <td className="cell-mono">₹{(log.cost / log.liters).toFixed(2)}</td>
-                        <td className="cell-mono" style={{ color: log.trip_number ? 'var(--accent-blue)' : 'var(--text-muted)' }}>
+                        <td className={log.trip_number ? 'cell-link' : 'cell-muted'}>
                           {log.trip_number || '—'}
                         </td>
                       </tr>
@@ -451,7 +451,7 @@ export default function ExpensesPage() {
 
         {activeTab === 'expenses' && (
           <div className="expense-table-container">
-            <table className="data-table">
+            <table className="expense-table">
               <thead>
                 <tr>
                   <th>Date</th>
@@ -465,16 +465,16 @@ export default function ExpensesPage() {
                 {filteredExpenses.length === 0 ? (
                   <tr><td colSpan={5} style={{ textAlign: 'center', padding: '48px', color: 'var(--text-muted)' }}>No expenses found.</td></tr>
                 ) : (
-                  filteredExpenses.map(exp => {
+                  filteredExpenses.map((exp, i) => {
                     const vehicle = getVehicle(exp.vehicle_id);
                     const typeInfo = EXPENSE_TYPE_COLORS[exp.expense_type] || EXPENSE_TYPE_COLORS['Other'];
                     return (
-                      <tr key={exp.id}>
-                        <td>{formatDate(exp.date)}</td>
+                      <tr key={exp.id} style={{ animationDelay: `${i * 40}ms` }}>
+                        <td className="cell-bold">{formatDate(exp.date)}</td>
                         <td className="cell-mono">{vehicle?.registration_number}</td>
                         <td><span className={`expense-type-badge ${typeInfo.class}`}>{exp.expense_type}</span></td>
                         <td className="cell-mono">{formatCurrency(exp.cost)}</td>
-                        <td style={{ color: 'var(--text-secondary)' }}>{exp.description || '—'}</td>
+                        <td className="cell-secondary">{exp.description || '—'}</td>
                       </tr>
                     );
                   })
